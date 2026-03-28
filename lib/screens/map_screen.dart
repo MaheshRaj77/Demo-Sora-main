@@ -34,12 +34,12 @@ class _MapScreenState extends State<MapScreen> {
   bool _isNavigating = false;
 
   // ── Campus landmarks ──
-  static final List<_Landmark> _landmarks = [
+  List<_Landmark> _getLandmarks(Tc tc) => [
     _Landmark('Library', LatLng(12.0155, 79.8565), Icons.local_library,
-        AppColors.accentTeal,
+        tc.accent,
         detail: 'Central Library · 8 AM – 8 PM'),
     _Landmark('Cafeteria', LatLng(12.0140, 79.8590), Icons.restaurant,
-        AppColors.accentOrange,
+        tc.primary,
         detail: 'Main Cafeteria · 7 AM – 10 PM'),
     _Landmark('Sports Complex', LatLng(12.0120, 79.8555), Icons.sports_soccer,
         AppColors.accentGreen,
@@ -51,10 +51,10 @@ class _MapScreenState extends State<MapScreen> {
         AppColors.accentPink,
         detail: 'Main Entrance · Open 24 h'),
     _Landmark(
-        'Hostels', LatLng(12.0210, 79.8530), Icons.hotel, AppColors.accentCyan,
+        'Hostels', LatLng(12.0210, 79.8530), Icons.hotel, AppColors.accentTeal,
         detail: 'Residential Blocks A–F'),
     _Landmark('Silver Jubilee', LatLng(12.0080, 79.8520), Icons.account_balance,
-        AppColors.accentOrange,
+        tc.primary,
         detail: 'Convention Hall · Events'),
     _Landmark('Stadium', LatLng(12.0115, 79.8500), Icons.stadium,
         AppColors.accentGreen,
@@ -148,13 +148,13 @@ class _MapScreenState extends State<MapScreen> {
           const SectionHeader(title: 'Bus Tracking'),
           const SizedBox(height: 14),
           _buildBusCard(tc, 'Route A', 'Main Gate → Library → Hostel',
-              'Arriving in 5 min', AppColors.accentTeal),
+              'Arriving in 5 min', tc.accent),
           const SizedBox(height: 12),
           _buildBusCard(tc, 'Route B', 'Hostel → Cafeteria → Sports Complex',
               'Arriving in 12 min', AppColors.accentPurple),
           const SizedBox(height: 12),
           _buildBusCard(tc, 'Route C', 'Academic Block → Lab → Main Gate',
-              'In Transit', AppColors.accentOrange),
+              'In Transit', tc.primary),
           const SizedBox(height: 28),
           const SectionHeader(title: 'University Map'),
           const SizedBox(height: 14),
@@ -204,7 +204,7 @@ class _MapScreenState extends State<MapScreen> {
                               Polyline(
                                 points: _buildRoute(_myLocation, dest.position),
                                 strokeWidth: 4.0,
-                                color: AppColors.accentTeal,
+                                color: tc.accent,
                                 pattern: StrokePattern.dashed(
                                     segments: const [12, 6]),
                               ),
@@ -220,13 +220,13 @@ class _MapScreenState extends State<MapScreen> {
                               height: 36,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: AppColors.accentTeal,
+                                  color: tc.accent,
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                       color: Colors.white, width: 2.5),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: AppColors.accentTeal
+                                      color: tc.accent
                                           .withValues(alpha: 0.5),
                                       blurRadius: 10,
                                       spreadRadius: 2,
@@ -238,7 +238,7 @@ class _MapScreenState extends State<MapScreen> {
                               ),
                             ),
                             // Landmark markers
-                            ..._landmarks.map((lm) => Marker(
+                            ..._getLandmarks(tc).map((lm) => Marker(
                                   point: lm.position,
                                   width: 120,
                                   height: 58,
@@ -299,10 +299,10 @@ class _MapScreenState extends State<MapScreen> {
                     margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppColors.accentTeal.withValues(alpha: 0.12),
+                      color: tc.accent.withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                          color: AppColors.accentTeal.withValues(alpha: 0.4)),
+                          color: tc.accent.withValues(alpha: 0.4)),
                     ),
                     child: Row(
                       children: [
@@ -338,24 +338,24 @@ class _MapScreenState extends State<MapScreen> {
                               Row(
                                 children: [
                                   Icon(Icons.straighten,
-                                      size: 13, color: AppColors.accentTeal),
+                                      size: 13, color: tc.accent),
                                   const SizedBox(width: 4),
                                   Text(
                                     _formatDistance(dist),
                                     style: TextStyle(
-                                      color: AppColors.accentTeal,
+                                      color: tc.accent,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   const SizedBox(width: 12),
                                   Icon(Icons.directions_walk,
-                                      size: 13, color: AppColors.accentTeal),
+                                      size: 13, color: tc.accent),
                                   const SizedBox(width: 4),
                                   Text(
                                     '~${_walkingMinutes(dist)} min walk',
                                     style: TextStyle(
-                                      color: AppColors.accentTeal,
+                                      color: tc.accent,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -391,7 +391,7 @@ class _MapScreenState extends State<MapScreen> {
                         spacing: 10,
                         runSpacing: 10,
                         children:
-                            _landmarks.map((lm) => _navChip(tc, lm)).toList(),
+                            _getLandmarks(tc).map((lm) => _navChip(tc, lm)).toList(),
                       ),
                     ],
                   ),

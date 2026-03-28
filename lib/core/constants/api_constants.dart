@@ -6,8 +6,11 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 class ApiConstants {
   ApiConstants._();
 
-  static const bool isProduction = false;
-  static const String prodBaseUrl = 'https://punova-api.onrender.com/api/v1';
+  static const bool isProduction = bool.fromEnvironment('IS_PROD', defaultValue: false);
+  static const String prodBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'https://punova-api.onrender.com/api/v1',
+  );
 
   /// Auto-detect base URL based on platform
   static const String _envIp = String.fromEnvironment('BACKEND_IP');

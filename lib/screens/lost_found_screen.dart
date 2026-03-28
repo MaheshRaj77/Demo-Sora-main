@@ -75,7 +75,7 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
               margin: EdgeInsets.only(right: i < _totalSteps - 1 ? 6 : 0),
               height: 4,
               decoration: BoxDecoration(
-                gradient: isActive ? AppColors.primaryGradient : null,
+                gradient: isActive ? tc.primaryGradient : null,
                 color: isActive ? null : tc.glassWhite,
                 borderRadius: BorderRadius.circular(4),
               ),
@@ -161,9 +161,9 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                    color: isSelected ? AppColors.accentTeal : tc.glassBorder,
+                    color: isSelected ? tc.accent : tc.glassBorder,
                     width: 2),
-                color: isSelected ? AppColors.accentTeal : Colors.transparent,
+                color: isSelected ? tc.accent : Colors.transparent,
               ),
               child: isSelected
                   ? const Icon(Icons.check, size: 16, color: Colors.white)
@@ -206,7 +206,7 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
                 decoration: BoxDecoration(
-                  gradient: isSelected ? AppColors.primaryGradient : null,
+                  gradient: isSelected ? tc.primaryGradient : null,
                   color: isSelected ? null : tc.glassWhite,
                   borderRadius: BorderRadius.circular(14),
                   border: isSelected ? null : Border.all(color: tc.glassBorder),
@@ -322,7 +322,7 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
                         width: 70,
                         height: 70,
                         decoration: BoxDecoration(
-                          gradient: AppColors.primaryGradient,
+                          gradient: tc.primaryGradient,
                           borderRadius: BorderRadius.circular(22),
                         ),
                         child: const Icon(Icons.camera_alt_rounded,

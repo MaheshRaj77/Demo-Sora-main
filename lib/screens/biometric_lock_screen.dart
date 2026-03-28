@@ -126,11 +126,11 @@ class _BiometricLockScreenState extends State<BiometricLockScreen>
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
+                  gradient: tc.primaryGradient,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.accentTeal.withValues(alpha: 0.3),
+                      color: tc.accent.withValues(alpha: 0.3),
                       blurRadius: 32,
                       offset: const Offset(0, 12),
                     ),
@@ -166,10 +166,10 @@ class _BiometricLockScreenState extends State<BiometricLockScreen>
                     height: 90,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: AppColors.primaryGradient,
+                      gradient: tc.primaryGradient,
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.accentTeal.withValues(alpha: 0.4),
+                          color: tc.accent.withValues(alpha: 0.4),
                           blurRadius: 24,
                           offset: const Offset(0, 8),
                         ),

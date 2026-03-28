@@ -108,12 +108,12 @@ class _TimetableScreenState extends State<TimetableScreen> {
               const GlassAppBar(title: 'Timetable'),
               const SizedBox(height: 8),
               _buildDaySelector(tc),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               Expanded(
                 child: _isLoading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(
-                            color: AppColors.accentTeal))
+                            color: tc.accent))
                     : _entries.isEmpty
                         ? Center(
                             child: Text('No classes today',
@@ -153,7 +153,7 @@ class _TimetableScreenState extends State<TimetableScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 decoration: BoxDecoration(
-                  gradient: isSelected ? AppColors.primaryGradient : null,
+                  gradient: isSelected ? tc.primaryGradient : null,
                   color: isSelected ? null : tc.glassWhite,
                   borderRadius: BorderRadius.circular(14),
                   border: isSelected ? null : Border.all(color: tc.glassBorder),

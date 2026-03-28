@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_widgets.dart';
+import '../widgets/shared_widgets.dart';
 import '../services/api_service.dart';
 import '../models/service_item.dart';
 
@@ -14,6 +15,7 @@ class ServicesScreen extends StatefulWidget {
 class _ServicesScreenState extends State<ServicesScreen> {
   List<_ServiceDisplayData> _services = [];
   bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -22,7 +24,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 
   Future<void> _fetchServices() async {
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
     try {
       final response = await ApiService().get('/services');
       final servicesJson = response['services'] as List;
@@ -62,16 +67,34 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
   IconData _iconFromServiceName(String name) {
     final lower = name.toLowerCase();
-    if (lower.contains('library')) return Icons.menu_book_rounded;
-    if (lower.contains('health') || lower.contains('medical')) return Icons.local_hospital_rounded;
-    if (lower.contains('it') || lower.contains('help') || lower.contains('tech')) return Icons.computer_rounded;
-    if (lower.contains('cafeteria') || lower.contains('food') || lower.contains('canteen')) return Icons.fastfood_rounded;
-    if (lower.contains('sport') || lower.contains('gym')) return Icons.sports_soccer_rounded;
-    if (lower.contains('laundry')) return Icons.local_laundry_service_rounded;
-    if (lower.contains('print') || lower.contains('xerox')) return Icons.print_rounded;
-    if (lower.contains('hostel')) return Icons.hotel_rounded;
-    if (lower.contains('transport') || lower.contains('bus')) return Icons.directions_bus_rounded;
-    if (lower.contains('pay') || lower.contains('wallet') || lower.contains('fee')) return Icons.account_balance_wallet_rounded;
+    if (lower.contains('library')) { return Icons.menu_book_rounded; }
+    if (lower.contains('health') || lower.contains('medical')) {
+      return Icons.local_hospital_rounded;
+    }
+    if (lower.contains('it') || lower.contains('help') || lower.contains('tech')) {
+      return Icons.computer_rounded;
+    }
+    if (lower.contains('cafeteria') ||
+        lower.contains('food') ||
+        lower.contains('canteen')) {
+      return Icons.fastfood_rounded;
+    }
+    if (lower.contains('sport') || lower.contains('gym')) {
+      return Icons.sports_soccer_rounded;
+    }
+    if (lower.contains('laundry')) { return Icons.local_laundry_service_rounded; }
+    if (lower.contains('print') || lower.contains('xerox')) {
+      return Icons.print_rounded;
+    }
+    if (lower.contains('hostel')) { return Icons.hotel_rounded; }
+    if (lower.contains('transport') || lower.contains('bus')) {
+      return Icons.directions_bus_rounded;
+    }
+    if (lower.contains('pay') ||
+        lower.contains('wallet') ||
+        lower.contains('fee')) {
+      return Icons.account_balance_wallet_rounded;
+    }
     return Icons.miscellaneous_services_rounded;
   }
 
@@ -94,43 +117,64 @@ class _ServicesScreenState extends State<ServicesScreen> {
   LinearGradient _gradientFromCategory(String? category) {
     switch (category?.toLowerCase()) {
       case 'academic':
-        return const LinearGradient(colors: [Color(0xFF6366F1), Color(0xFF818CF8)]);
+        return const LinearGradient(
+            colors: [Color(0xFF6366F1), Color(0xFF818CF8)]);
       case 'health':
-        return const LinearGradient(colors: [Color(0xFF22C55E), Color(0xFF4ADE80)]);
+        return const LinearGradient(
+            colors: [Color(0xFF22C55E), Color(0xFF4ADE80)]);
       case 'tech':
-        return const LinearGradient(colors: [Color(0xFF14B8A6), Color(0xFF2DD4BF)]);
+        return const LinearGradient(
+            colors: [Color(0xFF14B8A6), Color(0xFF2DD4BF)]);
       case 'food':
-        return const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFF7931E)]);
+        return const LinearGradient(
+            colors: [Color(0xFFFF6B35), Color(0xFFF7931E)]);
       case 'recreation':
-        return const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)]);
+        return const LinearGradient(
+            colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)]);
       default:
-        return const LinearGradient(colors: [Color(0xFFEC4899), Color(0xFFF472B6)]);
+        return const LinearGradient(
+            colors: [Color(0xFFEC4899), Color(0xFFF472B6)]);
     }
   }
 
   List<_ServiceDisplayData> _staticServices() {
     return [
-      _ServiceDisplayData('Papido', 'Food Ordering', Icons.fastfood_rounded,
-          const LinearGradient(colors: [Color(0xFFFF6B35), Color(0xFFF7931E)])),
+      _ServiceDisplayData(
+          'Papido',
+          'Food Ordering',
+          Icons.fastfood_rounded,
+          const LinearGradient(
+              colors: [Color(0xFFFF6B35), Color(0xFFF7931E)])),
       _ServiceDisplayData(
           'Plink It',
           'Digital Payments',
           Icons.account_balance_wallet_rounded,
-          const LinearGradient(colors: [Color(0xFF6366F1), Color(0xFF818CF8)])),
+          const LinearGradient(
+              colors: [Color(0xFF6366F1), Color(0xFF818CF8)])),
       _ServiceDisplayData(
           'Laundry',
           'Schedule Pickup',
           Icons.local_laundry_service_rounded,
-          const LinearGradient(colors: [Color(0xFF14B8A6), Color(0xFF2DD4BF)])),
-      _ServiceDisplayData('Stationery', 'Order Supplies', Icons.edit_rounded,
-          const LinearGradient(colors: [Color(0xFFEC4899), Color(0xFFF472B6)])),
-      _ServiceDisplayData('Print Shop', 'Print & Copy', Icons.print_rounded,
-          const LinearGradient(colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)])),
+          const LinearGradient(
+              colors: [Color(0xFF14B8A6), Color(0xFF2DD4BF)])),
+      _ServiceDisplayData(
+          'Stationery',
+          'Order Supplies',
+          Icons.edit_rounded,
+          const LinearGradient(
+              colors: [Color(0xFFEC4899), Color(0xFFF472B6)])),
+      _ServiceDisplayData(
+          'Print Shop',
+          'Print & Copy',
+          Icons.print_rounded,
+          const LinearGradient(
+              colors: [Color(0xFFF59E0B), Color(0xFFFBBF24)])),
       _ServiceDisplayData(
           'Health',
           'Medical Services',
           Icons.local_hospital_rounded,
-          const LinearGradient(colors: [Color(0xFF22C55E), Color(0xFF4ADE80)])),
+          const LinearGradient(
+              colors: [Color(0xFF22C55E), Color(0xFF4ADE80)])),
     ];
   }
 
@@ -147,18 +191,37 @@ class _ServicesScreenState extends State<ServicesScreen> {
               const GlassAppBar(title: 'Services'),
               Expanded(
                 child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.accentTeal))
-                    : RefreshIndicator(
-                        onRefresh: _fetchServices,
-                        color: AppColors.accentTeal,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                          itemCount: _services.length,
-                          itemBuilder: (_, i) => _serviceCard(tc, _services[i]),
-                        ),
-                      ),
+                    ? _buildSkeletonGrid()
+                    : _hasError
+                        ? ErrorCard(
+                            message: 'Could not load services',
+                            onRetry: _fetchServices,
+                          )
+                        : _services.isEmpty
+                            ? const EmptyState(
+                                icon: Icons.miscellaneous_services_rounded,
+                                title: 'No services available',
+                                subtitle:
+                                    'Campus services will appear here once configured.',
+                              )
+                            : RefreshIndicator(
+                                onRefresh: _fetchServices,
+                                color: tc.accent,
+                                child: GridView.builder(
+                                  padding: const EdgeInsets.fromLTRB(
+                                      20, 10, 20, 20),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    mainAxisSpacing: 14,
+                                    crossAxisSpacing: 14,
+                                    childAspectRatio: 0.95,
+                                  ),
+                                  itemCount: _services.length,
+                                  itemBuilder: (_, i) =>
+                                      _serviceGridCard(tc, _services[i]),
+                                ),
+                              ),
               ),
             ],
           ),
@@ -167,40 +230,64 @@ class _ServicesScreenState extends State<ServicesScreen> {
     );
   }
 
-  Widget _serviceCard(Tc tc, _ServiceDisplayData s) {
+  Widget _buildSkeletonGrid() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: GlassCard(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                  gradient: s.gradient,
-                  borderRadius: BorderRadius.circular(16)),
-              child: Icon(s.icon, color: Colors.white, size: 26),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(s.name,
-                      style: TextStyle(
-                          color: tc.textPrimary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16)),
-                  const SizedBox(height: 4),
-                  Text(s.subtitle,
-                      style: TextStyle(color: tc.textMuted, fontSize: 13)),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right_rounded, color: tc.textMuted, size: 24),
-          ],
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+      child: GridView.builder(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 14,
+          crossAxisSpacing: 14,
+          childAspectRatio: 0.95,
         ),
+        itemCount: 6,
+        itemBuilder: (_, __) => const SkeletonCard(height: double.infinity),
+      ),
+    );
+  }
+
+  Widget _serviceGridCard(Tc tc, _ServiceDisplayData s) {
+    return GlassCard(
+      padding: const EdgeInsets.all(18),
+      onTap: () {
+        // TODO: Navigate to service detail
+      },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              gradient: s.gradient,
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: s.gradient.colors.first.withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Icon(s.icon, color: Colors.white, size: 28),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            s.name,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: tc.textPrimary,
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            s.subtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: tc.textMuted, fontSize: 12),
+          ),
+        ],
       ),
     );
   }

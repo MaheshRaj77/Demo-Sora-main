@@ -1,5 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
+import 'dart:convert';
 import 'api_service.dart';
 
 /// Manages authentication state — login, register, token storage, and refresh.
@@ -62,10 +63,10 @@ class AuthService {
       'email': email,
       'password': password,
       'full_name': fullName,
-      if (department != null) 'department': department,
-      if (year != null) 'year': year,
-      if (semester != null) 'semester': semester,
-      if (rollNumber != null) 'roll_number': rollNumber,
+      if (department != null && department.isNotEmpty) 'department': department,
+      if (year != null && year.isNotEmpty) 'year': year,
+      if (semester != null && semester.isNotEmpty) 'semester': semester,
+      if (rollNumber != null && rollNumber.isNotEmpty) 'roll_number': rollNumber,
     });
 
     await _saveSession(response['token'], response['refresh_token'], response['user']);
@@ -104,15 +105,20 @@ class AuthService {
 
       final response = await ApiService().post(
         '/auth/refresh-token',
-        body: {'refresh_token': refreshToken},
+        body: {'refreshToken': refreshToken},
         skipAuthHeader: true, // Don't include Authorization header
       );
 
       final newAccessToken = response['token'];
+      final newRefreshToken = response['refresh_token'];
       if (newAccessToken != null) {
         _cachedToken = newAccessToken;
+        _cachedRefreshToken = newRefreshToken;
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(_tokenKey, newAccessToken);
+        if (newRefreshToken != null) {
+          await prefs.setString(_refreshTokenKey, newRefreshToken);
+        }
         return true;
       }
 
@@ -194,5 +200,6 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
     await prefs.setString(_refreshTokenKey, refreshToken);
+    await prefs.setString(_userKey, jsonEncode(user));
   }
 }

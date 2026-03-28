@@ -1,291 +1,325 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// ─── PUnova · Apple Liquid Glass Design System ─────────────────────
+/// ─── PUnova · Minimal Neutral Design System (Apple / Notion Style) ──
+
+// ═══════════════════════════════════════════════════════════════════════
+// COLOR PALETTE — 90% neutral, 10% accent
+// ═══════════════════════════════════════════════════════════════════════
 
 class AppColors {
-  // ── Core backgrounds ──
-  static const Color bgDark = Color(0xFF050A18);
-  static const Color bgMedium = Color(0xFF0C1228);
-  static const Color bgCard = Color(0xFF111833);
+  // ── Core ──
+  static const Color primary = Color(0xFF000000);
+  static const Color secondary = Color(0xFF6B7280);
+  static const Color accent = Color(0xFF2563EB); // Used sparingly
 
-  // ── Liquid Glass colors ──
-  static const Color glassWhite = Color(0x14FFFFFF); // 8%
-  static const Color glassFill = Color(0x1AFFFFFF); // 10%
-  static const Color glassBorder = Color(0x28FFFFFF); // 16%
-  static const Color glassHighlight = Color(0x0AFFFFFF); // 4%
-  static const Color glassInner = Color(0x08FFFFFF); // 3%
-
-  // ── Liquid Accents ──
-  static const Color accentTeal = Color(0xFF00D4FF);
-  static const Color accentCyan = Color(0xFF00F5D4);
-  static const Color accentPurple = Color(0xFF8B5CF6);
-  static const Color accentPink = Color(0xFFEC4899);
-  static const Color accentOrange = Color(0xFFFF8C00);
-  static const Color accentGreen = Color(0xFF22C55E);
-  static const Color accentRed = Color(0xFFEF4444);
-  static const Color accentBlue = Color(0xFF3B82F6);
-  static const Color accentAmber = Color(0xFFF59E0B);
-
-  // ── Text ──
-  static const Color textPrimary = Color(0xFFF1F5F9);
-  static const Color textSecondary = Color(0xFF94A3B8);
-  static const Color textMuted = Color(0xFF64748B);
-  static const Color textHint = Color(0xFF475569);
-
-  // ── Gradients ──
-  static const LinearGradient primaryGradient = LinearGradient(
-    colors: [accentTeal, Color(0xFF00C4E0), accentCyan],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient purpleGradient = LinearGradient(
-    colors: [accentPurple, Color(0xFFA78BFA), accentPink],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient warmGradient = LinearGradient(
-    colors: [Color(0xFFFF8C00), Color(0xFFFF6B35), Color(0xFFFF5E00)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient glassGradient = LinearGradient(
-    colors: [Color(0x12FFFFFF), Color(0x08FFFFFF)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  static const LinearGradient bgGradient = LinearGradient(
-    colors: [bgDark, Color(0xFF080E24), bgMedium],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-  );
-
-  static const LinearGradient meshGradient = LinearGradient(
-    colors: [
-      Color(0xFF050A18),
-      Color(0xFF0A1030),
-      Color(0xFF080D22),
-      Color(0xFF050A18),
-    ],
-    stops: [0.0, 0.3, 0.7, 1.0],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-}
-
-/// Light-mode color overrides
-class LightColors {
-  static const Color bgLight = Color(0xFFF5F5F7);
-  static const Color bgMedium = Color(0xFFE8E8ED);
+  // ── Backgrounds ──
+  static const Color bgWhite = Color(0xFFFFFFFF);
+  static const Color bgSurface = Color(0xFFF5F5F7);
   static const Color bgCard = Color(0xFFFFFFFF);
 
-  static const Color glassWhite = Color(0x0A000000);
-  static const Color glassFill = Color(0x10000000);
-  static const Color glassBorder = Color(0x14000000);
-  static const Color glassHighlight = Color(0x05000000);
+  // ── Borders ──
+  static const Color border = Color(0xFFE5E7EB);
+  static const Color borderLight = Color(0xFFF0F0F2);
 
-  static const Color textPrimary = Color(0xFF1D1D1F);
-  static const Color textSecondary = Color(0xFF6E6E73);
-  static const Color textMuted = Color(0xFF8E8E93);
+  // ── Text ──
+  static const Color textPrimary = Color(0xFF111111);
+  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color textMuted = Color(0xFF9CA3AF);
+  static const Color textHint = Color(0xFFBDBDBD);
 
-  static const LinearGradient bgGradient = LinearGradient(
-    colors: [Color(0xFFF5F5F7), Color(0xFFF0F0F2), Color(0xFFE8E8ED)],
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-  );
+  // ── Semantic ──
+  static const Color success = Color(0xFF16A34A);
+  static const Color warning = Color(0xFFD97706);
+  static const Color error = Color(0xFFDC2626);
+
+  // ── Feature Accent Colors (used on icon backgrounds, sparingly) ──
+  static const Color accentPurple = Color(0xFF7C3AED);
+  static const Color accentPink = Color(0xFFEC4899);
+  static const Color accentTeal = Color(0xFF0D9488);
+  static const Color accentOrange = Color(0xFFEA580C);
+  static const Color accentGreen = Color(0xFF16A34A);
+  static const Color accentBlue = Color(0xFF2563EB);
+  static const Color accentRed = Color(0xFFDC2626);
+
+  // ── Dark Mode Colors ──
+  static const Color darkBg = Color(0xFF111111);
+  static const Color darkSurface = Color(0xFF1C1C1E);
+  static const Color darkCard = Color(0xFF1C1C1E);
+  static const Color darkBorder = Color(0xFF2C2C2E);
+  static const Color darkTextPrimary = Color(0xFFFAFAFA);
+  static const Color darkTextSecondary = Color(0xFF9CA3AF);
+  static const Color darkTextMuted = Color(0xFF6B7280);
 }
 
-/// Theme-adaptive color resolver
+/// Theme-adaptive color resolver — the SINGLE source of truth for colors.
 class Tc {
   final bool isDark;
   Tc.of(BuildContext context)
       : isDark = Theme.of(context).brightness == Brightness.dark;
 
+  // ── Core ──
+  Color get primary => isDark ? Colors.white : AppColors.primary;
+  Color get accent => AppColors.accent;
+
+  // ── Backgrounds ──
+  Color get bg => isDark ? AppColors.darkBg : AppColors.bgWhite;
+  Color get bgSurface => isDark ? AppColors.darkSurface : AppColors.bgSurface;
+  Color get bgCard => isDark ? AppColors.darkCard : AppColors.bgCard;
+
+  // ── Borders ──
+  Color get border => isDark ? AppColors.darkBorder : AppColors.border;
+  Color get borderLight =>
+      isDark ? AppColors.darkBorder.withValues(alpha: 0.5) : AppColors.borderLight;
+
+  // ── Text ──
   Color get textPrimary =>
-      isDark ? AppColors.textPrimary : LightColors.textPrimary;
+      isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
   Color get textSecondary =>
-      isDark ? AppColors.textSecondary : LightColors.textSecondary;
-  Color get textMuted => isDark ? AppColors.textMuted : LightColors.textMuted;
-  Color get bg => isDark ? AppColors.bgDark : LightColors.bgLight;
-  Color get bgCard => isDark ? AppColors.bgCard : LightColors.bgCard;
-  Color get bgMedium => isDark ? AppColors.bgMedium : LightColors.bgMedium;
-  Color get glassWhite =>
-      isDark ? AppColors.glassWhite : LightColors.glassWhite;
-  Color get glassFill => isDark ? AppColors.glassFill : LightColors.glassFill;
-  Color get glassBorder =>
-      isDark ? AppColors.glassBorder : LightColors.glassBorder;
-  Color get glassHighlight =>
-      isDark ? AppColors.glassHighlight : LightColors.glassHighlight;
-  LinearGradient get bgGradient =>
-      isDark ? AppColors.bgGradient : LightColors.bgGradient;
+      isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+  Color get textMuted =>
+      isDark ? AppColors.darkTextMuted : AppColors.textMuted;
+
+  // ── Glass compatibility (mapped to flat neutral) ──
+  Color get glassFill => isDark ? AppColors.darkSurface : AppColors.bgSurface;
+  Color get glassBorder => border;
+  Color get glassWhite => isDark ? AppColors.darkCard : AppColors.bgWhite;
+  Color get glassHighlight => Colors.transparent;
+
+  // ── Gradients (subtle for neutral style) ──
+  LinearGradient get primaryGradient => isDark
+      ? const LinearGradient(colors: [Color(0xFF2563EB), Color(0xFF3B82F6)])
+      : const LinearGradient(colors: [AppColors.primary, Color(0xFF374151)]);
+
+  LinearGradient get secondaryGradient => isDark
+      ? const LinearGradient(colors: [Color(0xFF374151), Color(0xFF4B5563)])
+      : const LinearGradient(colors: [AppColors.secondary, Color(0xFF9CA3AF)]);
+
+  LinearGradient get bgGradient => isDark
+      ? const LinearGradient(
+          colors: [AppColors.darkBg, AppColors.darkBg],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        )
+      : const LinearGradient(
+          colors: [AppColors.bgWhite, AppColors.bgSurface],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        );
+
+  Color get bgMedium => isDark ? AppColors.darkSurface : AppColors.bgSurface;
 }
 
-class AppTheme {
-  static final String? _sfFamily = GoogleFonts.inter().fontFamily;
+// ═══════════════════════════════════════════════════════════════════════
+// THEME DATA
+// ═══════════════════════════════════════════════════════════════════════
 
-  static ThemeData get darkTheme {
+class AppTheme {
+  static final String? _fontFamily = GoogleFonts.inter().fontFamily;
+
+  // ── Light Theme (Primary) ──
+  static ThemeData get lightTheme {
     return ThemeData(
-      brightness: Brightness.dark,
-      primaryColor: AppColors.accentTeal,
-      scaffoldBackgroundColor: AppColors.bgDark,
-      fontFamily: _sfFamily,
-      textTheme: TextTheme(
-        headlineLarge: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 34,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-          letterSpacing: -0.5,
-          height: 1.2,
-        ),
-        headlineMedium: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 24,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-          letterSpacing: -0.3,
-        ),
-        titleLarge: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-          letterSpacing: -0.2,
-        ),
-        titleMedium: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-          color: AppColors.textPrimary,
-        ),
-        bodyLarge: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 17,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textSecondary,
-          height: 1.5,
-        ),
-        bodyMedium: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 15,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textSecondary,
-          height: 1.4,
-        ),
-        bodySmall: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 13,
-          fontWeight: FontWeight.w400,
-          color: AppColors.textMuted,
-          height: 1.4,
-        ),
-        labelLarge: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          color: AppColors.accentTeal,
-        ),
-        labelSmall: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: AppColors.textMuted,
-          letterSpacing: 0.5,
-        ),
+      brightness: Brightness.light,
+      primaryColor: AppColors.primary,
+      scaffoldBackgroundColor: AppColors.bgWhite,
+      fontFamily: _fontFamily,
+      textTheme: _buildTextTheme(
+        primary: AppColors.textPrimary,
+        secondary: AppColors.textSecondary,
+        muted: AppColors.textMuted,
       ),
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.accentTeal,
-        secondary: AppColors.accentPurple,
+      colorScheme: const ColorScheme.light(
+        primary: AppColors.primary,
+        secondary: AppColors.secondary,
         surface: AppColors.bgCard,
-        error: AppColors.accentRed,
+        error: AppColors.error,
       ),
+      dividerColor: AppColors.border,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
     );
   }
 
-  static ThemeData get lightTheme {
+  // ── Dark Theme ──
+  static ThemeData get darkTheme {
     return ThemeData(
-      brightness: Brightness.light,
-      primaryColor: AppColors.accentTeal,
-      scaffoldBackgroundColor: LightColors.bgLight,
-      fontFamily: _sfFamily,
-      textTheme: TextTheme(
-        headlineLarge: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 34,
-          fontWeight: FontWeight.w700,
-          color: LightColors.textPrimary,
-          letterSpacing: -0.5,
-          height: 1.2,
-        ),
-        headlineMedium: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 24,
-          fontWeight: FontWeight.w600,
-          color: LightColors.textPrimary,
-          letterSpacing: -0.3,
-        ),
-        titleLarge: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          color: LightColors.textPrimary,
-          letterSpacing: -0.2,
-        ),
-        titleMedium: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 17,
-          fontWeight: FontWeight.w600,
-          color: LightColors.textPrimary,
-        ),
-        bodyLarge: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 17,
-          fontWeight: FontWeight.w400,
-          color: LightColors.textSecondary,
-          height: 1.5,
-        ),
-        bodyMedium: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 15,
-          fontWeight: FontWeight.w400,
-          color: LightColors.textSecondary,
-          height: 1.4,
-        ),
-        bodySmall: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 13,
-          fontWeight: FontWeight.w400,
-          color: LightColors.textMuted,
-          height: 1.4,
-        ),
-        labelLarge: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          color: AppColors.accentTeal,
-        ),
-        labelSmall: TextStyle(
-          fontFamily: _sfFamily,
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-          color: LightColors.textMuted,
-          letterSpacing: 0.5,
-        ),
+      brightness: Brightness.dark,
+      primaryColor: Colors.white,
+      scaffoldBackgroundColor: AppColors.darkBg,
+      fontFamily: _fontFamily,
+      textTheme: _buildTextTheme(
+        primary: AppColors.darkTextPrimary,
+        secondary: AppColors.darkTextSecondary,
+        muted: AppColors.darkTextMuted,
       ),
-      colorScheme: const ColorScheme.light(
-        primary: AppColors.accentTeal,
-        secondary: AppColors.accentPurple,
-        surface: LightColors.bgCard,
-        error: AppColors.accentRed,
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.white,
+        secondary: AppColors.darkTextSecondary,
+        surface: AppColors.darkCard,
+        error: AppColors.error,
       ),
+      dividerColor: AppColors.darkBorder,
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
+    );
+  }
+
+  static TextTheme _buildTextTheme({
+    required Color primary,
+    required Color secondary,
+    required Color muted,
+  }) {
+    return TextTheme(
+      headlineLarge: TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 34,
+        fontWeight: FontWeight.w700,
+        color: primary,
+        letterSpacing: -0.5,
+        height: 1.2,
+      ),
+      headlineMedium: TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        color: primary,
+        letterSpacing: -0.3,
+      ),
+      titleLarge: TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: primary,
+        letterSpacing: -0.2,
+      ),
+      titleMedium: TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 17,
+        fontWeight: FontWeight.w600,
+        color: primary,
+      ),
+      bodyLarge: TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 17,
+        fontWeight: FontWeight.w400,
+        color: secondary,
+        height: 1.5,
+      ),
+      bodyMedium: TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 15,
+        fontWeight: FontWeight.w400,
+        color: secondary,
+        height: 1.4,
+      ),
+      bodySmall: TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+        color: muted,
+        height: 1.4,
+      ),
+      labelLarge: TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+        color: AppColors.accent,
+      ),
+      labelSmall: TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        color: muted,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // iOS CUPERTINO THEMES
+  // ═══════════════════════════════════════════════════════════════════════
+
+  static CupertinoThemeData get lightCupertinoTheme {
+    return CupertinoThemeData(
+      brightness: Brightness.light,
+      primaryColor: AppColors.primary,
+      primaryContrastingColor: AppColors.bgWhite,
+      barBackgroundColor: AppColors.bgWhite.withValues(alpha: 0.95),
+      scaffoldBackgroundColor: AppColors.bgWhite,
+      textTheme: CupertinoTextThemeData(
+        primaryColor: AppColors.primary,
+        textStyle: TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 17,
+          fontFamily: _fontFamily,
+        ),
+        actionTextStyle: TextStyle(
+          color: AppColors.accent,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          fontFamily: _fontFamily,
+        ),
+        tabLabelTextStyle: TextStyle(
+          color: AppColors.textSecondary,
+          fontSize: 10,
+          fontFamily: _fontFamily,
+        ),
+        navTitleTextStyle: TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          fontFamily: _fontFamily,
+        ),
+        navLargeTitleTextStyle: TextStyle(
+          color: AppColors.textPrimary,
+          fontSize: 34,
+          fontWeight: FontWeight.bold,
+          fontFamily: _fontFamily,
+        ),
+      ),
+    );
+  }
+
+  static CupertinoThemeData get darkCupertinoTheme {
+    return CupertinoThemeData(
+      brightness: Brightness.dark,
+      primaryColor: Colors.white,
+      primaryContrastingColor: AppColors.darkBg,
+      barBackgroundColor: AppColors.darkCard.withValues(alpha: 0.95),
+      scaffoldBackgroundColor: AppColors.darkBg,
+      textTheme: CupertinoTextThemeData(
+        primaryColor: Colors.white,
+        textStyle: TextStyle(
+          color: AppColors.darkTextPrimary,
+          fontSize: 17,
+          fontFamily: _fontFamily,
+        ),
+        actionTextStyle: TextStyle(
+          color: AppColors.accent,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          fontFamily: _fontFamily,
+        ),
+        tabLabelTextStyle: TextStyle(
+          color: AppColors.darkTextSecondary,
+          fontSize: 10,
+          fontFamily: _fontFamily,
+        ),
+        navTitleTextStyle: TextStyle(
+          color: AppColors.darkTextPrimary,
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+          fontFamily: _fontFamily,
+        ),
+        navLargeTitleTextStyle: TextStyle(
+          color: AppColors.darkTextPrimary,
+          fontSize: 34,
+          fontWeight: FontWeight.bold,
+          fontFamily: _fontFamily,
+        ),
+      ),
     );
   }
 }

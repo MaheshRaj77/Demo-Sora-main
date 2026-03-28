@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_widgets.dart';
+import '../widgets/shared_widgets.dart';
 import '../services/api_service.dart';
 import '../models/forum_post.dart';
 
@@ -14,6 +15,8 @@ class ForumScreen extends StatefulWidget {
 class _ForumScreenState extends State<ForumScreen> {
   List<ForumPost> _posts = [];
   bool _isLoading = true;
+  int _selectedFilter = 0;
+  final _filters = ['All', 'General', 'Study Groups', 'Events', 'Marketplace'];
 
   @override
   void initState() {
@@ -159,20 +162,35 @@ class _ForumScreenState extends State<ForumScreen> {
           child: Column(
             children: [
               const GlassAppBar(title: 'Forum'),
+              const SizedBox(height: 4),
+              // ── Filter Chips ──
+              ChipFilter(
+                labels: _filters,
+                selectedIndex: _selectedFilter,
+                onSelected: (i) => setState(() => _selectedFilter = i),
+              ),
+              const SizedBox(height: 12),
               Expanded(
                 child: _isLoading
-                    ? const Center(
-                        child: CircularProgressIndicator(
-                            color: AppColors.accentTeal))
-                    : RefreshIndicator(
-                        onRefresh: _fetchPosts,
-                        color: AppColors.accentTeal,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-                          itemCount: _posts.length,
-                          itemBuilder: (_, i) => _postCard(tc, _posts[i]),
-                        ),
-                      ),
+                    ? const Center(child: SkeletonListLoader(itemCount: 3))
+                    : _posts.isEmpty
+                        ? const EmptyState(
+                            icon: Icons.forum_outlined,
+                            title: 'No posts yet',
+                            subtitle:
+                                'Be the first to start a conversation!',
+                          )
+                        : RefreshIndicator(
+                            onRefresh: _fetchPosts,
+                            color: tc.accent,
+                            child: ListView.builder(
+                              padding:
+                                  const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                              itemCount: _posts.length,
+                              itemBuilder: (_, i) =>
+                                  _postCard(tc, _posts[i]),
+                            ),
+                          ),
               ),
             ],
           ),
@@ -184,8 +202,15 @@ class _ForumScreenState extends State<ForumScreen> {
           width: 56,
           height: 56,
           decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
+            gradient: tc.primaryGradient,
             borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: tc.accent.withValues(alpha: 0.3),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           child: const Icon(Icons.edit_rounded, color: Colors.white),
         ),

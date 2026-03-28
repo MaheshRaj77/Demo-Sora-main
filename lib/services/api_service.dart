@@ -146,9 +146,26 @@ class ApiService {
     }
 
     // Handle other errors
+    String errorMessage = responseBody['error'] ?? responseBody['message'] ?? 'Unknown error';
+    
+    if (responseBody['details'] != null && responseBody['details'] is Map) {
+      final details = responseBody['details'] as Map;
+      final errorList = <String>[];
+      for (final value in details.values) {
+        if (value is List) {
+          errorList.addAll(value.map((e) => e.toString()));
+        } else {
+          errorList.add(value.toString());
+        }
+      }
+      if (errorList.isNotEmpty) {
+        errorMessage += ': ' + errorList.join(', ');
+      }
+    }
+
     throw ApiException(
       statusCode: response.statusCode,
-      message: responseBody['error'] ?? responseBody['message'] ?? 'Unknown error',
+      message: errorMessage,
     );
   }
 
@@ -205,9 +222,26 @@ class ApiService {
       return responseBody;
     }
 
+    String errorMessage = responseBody['error'] ?? responseBody['message'] ?? 'Request failed after token refresh';
+    
+    if (responseBody['details'] != null && responseBody['details'] is Map) {
+      final details = responseBody['details'] as Map;
+      final errorList = <String>[];
+      for (final value in details.values) {
+        if (value is List) {
+          errorList.addAll(value.map((e) => e.toString()));
+        } else {
+          errorList.add(value.toString());
+        }
+      }
+      if (errorList.isNotEmpty) {
+        errorMessage += ': ' + errorList.join(', ');
+      }
+    }
+
     throw ApiException(
       statusCode: response.statusCode,
-      message: responseBody['error'] ?? 'Request failed after token refresh',
+      message: errorMessage,
     );
   }
 }

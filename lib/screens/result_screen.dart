@@ -73,7 +73,6 @@ class _ResultScreenState extends State<ResultScreen> {
           s['subject'] as String,
           gradeStr,
           gradePoints.round(),
-          _gradeColor(gradeStr),
         );
       }).toList();
 
@@ -135,15 +134,15 @@ class _ResultScreenState extends State<ResultScreen> {
     }
   }
 
-  Color _gradeColor(String grade) {
+  Color _gradeColor(Tc tc, String grade) {
     switch (grade) {
       case 'A+':
       case 'O':
         return AppColors.accentGreen;
       case 'A':
-        return AppColors.accentTeal;
+        return tc.accent;
       case 'B+':
-        return AppColors.accentOrange;
+        return tc.primary;
       case 'B':
         return AppColors.accentPurple;
       case 'C':
@@ -156,17 +155,17 @@ class _ResultScreenState extends State<ResultScreen> {
   Map<int, List<_SubjectGrade>> _staticResults() {
     return {
       4: [
-        _SubjectGrade('Data Structures', 'A+', 10, AppColors.accentGreen),
-        _SubjectGrade('Operating Systems', 'A', 9, AppColors.accentTeal),
-        _SubjectGrade('DBMS', 'A+', 10, AppColors.accentGreen),
-        _SubjectGrade('Computer Networks', 'B+', 8, AppColors.accentOrange),
-        _SubjectGrade('Mathematics III', 'A', 9, AppColors.accentTeal),
+        _SubjectGrade('Data Structures', 'A+', 10),
+        _SubjectGrade('Operating Systems', 'A', 9),
+        _SubjectGrade('DBMS', 'A+', 10),
+        _SubjectGrade('Computer Networks', 'B+', 8),
+        _SubjectGrade('Mathematics III', 'A', 9),
       ],
       3: [
-        _SubjectGrade('OOP with Java', 'A', 9, AppColors.accentTeal),
-        _SubjectGrade('Digital Electronics', 'B+', 8, AppColors.accentOrange),
-        _SubjectGrade('Discrete Maths', 'A+', 10, AppColors.accentGreen),
-        _SubjectGrade('Data Communication', 'B', 7, AppColors.accentPurple),
+        _SubjectGrade('OOP with Java', 'A', 9),
+        _SubjectGrade('Digital Electronics', 'B+', 8),
+        _SubjectGrade('Discrete Maths', 'A+', 10),
+        _SubjectGrade('Data Communication', 'B', 7),
       ],
     };
   }
@@ -243,7 +242,7 @@ class _ResultScreenState extends State<ResultScreen> {
               width: 78,
               margin: const EdgeInsets.only(right: 10),
               decoration: BoxDecoration(
-                gradient: isSelected ? AppColors.primaryGradient : null,
+                gradient: isSelected ? tc.primaryGradient : null,
                 color: isSelected ? null : tc.glassWhite,
                 borderRadius: BorderRadius.circular(12),
                 border: isSelected ? null : Border.all(color: tc.glassBorder),
@@ -263,14 +262,14 @@ class _ResultScreenState extends State<ResultScreen> {
 
   Widget _buildGpaSummary(Tc tc) {
     return GlassCard(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           Column(children: [
-            const Text('SGPA',
+            Text('SGPA',
                 style: TextStyle(
-                    color: AppColors.accentTeal,
+                    color: tc.accent,
                     fontSize: 12,
                     fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
@@ -314,6 +313,7 @@ class _ResultScreenState extends State<ResultScreen> {
   }
 
   Widget _gradeCard(Tc tc, _SubjectGrade g) {
+    final gradeColor = _gradeColor(tc, g.grade);
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: GlassCard(
@@ -324,12 +324,12 @@ class _ResultScreenState extends State<ResultScreen> {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                  color: g.color.withValues(alpha: 0.15),
+                  color: gradeColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12)),
               child: Center(
                   child: Text(g.grade,
                       style: TextStyle(
-                          color: g.color,
+                          color: gradeColor,
                           fontWeight: FontWeight.w800,
                           fontSize: 16))),
             ),
@@ -359,8 +359,7 @@ class _ResultScreenState extends State<ResultScreen> {
 class _SubjectGrade {
   final String name, grade;
   final int point;
-  final Color color;
-  const _SubjectGrade(this.name, this.grade, this.point, this.color);
+  const _SubjectGrade(this.name, this.grade, this.point);
 }
 
 class _SemesterData {

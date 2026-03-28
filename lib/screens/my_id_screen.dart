@@ -192,7 +192,9 @@ class _MyIdScreenState extends State<MyIdScreen> {
                       padding: const EdgeInsets.all(4),
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: AppColors.warmGradient,
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
+                        ),
                       ),
                       child: Container(
                         padding: const EdgeInsets.all(3),
@@ -209,14 +211,14 @@ class _MyIdScreenState extends State<MyIdScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 1),
+              SizedBox(height: 1),
 
               // ── Name & Role ──
               _isLoading
-                  ? const Padding(
+                  ? Padding(
                       padding: EdgeInsets.symmetric(vertical: 16),
                       child: CircularProgressIndicator(
-                          strokeWidth: 2, color: AppColors.accentTeal),
+                          strokeWidth: 2, color: tc.accent),
                     )
                   : Column(
                       children: [
@@ -229,18 +231,18 @@ class _MyIdScreenState extends State<MyIdScreen> {
                         ),
                         const SizedBox(height: 6),
                         Container(
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                               horizontal: 14, vertical: 5),
                           decoration: BoxDecoration(
-                            color: AppColors.accentTeal.withValues(alpha: 0.12),
+                            color: tc.accent.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             _role,
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: AppColors.accentTeal,
+                                color: tc.accent,
                                 letterSpacing: 1.4),
                           ),
                         ),
@@ -255,7 +257,7 @@ class _MyIdScreenState extends State<MyIdScreen> {
                 height: 160,
                 child: CustomPaint(
                   painter: _CornerBorderPainter(
-                    color: AppColors.accentTeal.withValues(alpha: 0.35),
+                    color: tc.accent.withValues(alpha: 0.35),
                     strokeWidth: 2.5,
                     cornerLength: 24,
                     cornerRadius: 8,
@@ -323,7 +325,7 @@ class _MyIdScreenState extends State<MyIdScreen> {
                                 letterSpacing: 1)),
                         const SizedBox(height: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(
+                          padding: EdgeInsets.symmetric(
                               horizontal: 12, vertical: 10),
                           decoration: BoxDecoration(
                             color: tc.glassFill,
@@ -333,8 +335,8 @@ class _MyIdScreenState extends State<MyIdScreen> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.computer_rounded,
-                                  size: 16, color: AppColors.accentTeal),
+                              Icon(Icons.computer_rounded,
+                                  size: 16, color: tc.accent),
                               const SizedBox(width: 8),
                               Text(_department,
                                   style: TextStyle(

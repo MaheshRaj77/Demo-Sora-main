@@ -61,7 +61,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
             Positioned(
               top: -80,
               right: -60,
-              child: _orb(AppColors.accentTeal, 300, 0.1),
+              child: _orb(tc.accent, 300, 0.1),
             ),
             Positioned(
               bottom: 140,
@@ -140,7 +140,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: AppColors.accentTeal.withValues(alpha: 0.3),
+            color: tc.accent.withValues(alpha: 0.3),
             blurRadius: 36,
             offset: const Offset(0, 12),
           ),
@@ -182,7 +182,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 16, color: AppColors.accentTeal),
+              Icon(icon, size: 16, color: tc.accent),
               const SizedBox(width: 8),
               Text(
                 label,

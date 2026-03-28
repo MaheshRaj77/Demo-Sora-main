@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:ui';
+import 'package:flutter/cupertino.dart';
+import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/api_config.dart';
 import 'theme/app_theme.dart';
@@ -23,10 +24,11 @@ void main() async {
   // ✅ Initialize API configuration
   ApiConfig.initialize();
   
-  GoogleFonts.config.allowRuntimeFetching = false;
+  // Allow google_fonts to fetch fonts during development
+  GoogleFonts.config.allowRuntimeFetching = true;
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.dark,
     systemNavigationBarColor: Colors.transparent,
   ));
   runApp(const ProviderScope(child: CampusConnectApp()));
@@ -34,7 +36,7 @@ void main() async {
 
 /// Global theme notifier — shared across the whole app.
 class ThemeNotifier extends ChangeNotifier {
-  bool _isDarkMode = true;
+  bool _isDarkMode = false;
   String? _profileImagePath;
 
   bool get isDarkMode => _isDarkMode;
@@ -89,6 +91,29 @@ class _CampusConnectAppState extends State<CampusConnectApp> {
       child: AnimatedBuilder(
         animation: _themeNotifier,
         builder: (context, _) {
+          // iOS: Use Cupertino (Native iOS Look & Feel)
+          if (Platform.isIOS) {
+            return CupertinoApp(
+              title: 'PUnova',
+              debugShowCheckedModeBanner: false,
+              theme: _themeNotifier.isDarkMode
+                  ? AppTheme.darkCupertinoTheme
+                  : AppTheme.lightCupertinoTheme,
+              localizationsDelegates: const [
+                DefaultMaterialLocalizations.delegate,
+                DefaultCupertinoLocalizations.delegate,
+                DefaultWidgetsLocalizations.delegate,
+              ],
+              builder: (context, child) => ScaffoldMessenger(
+                child: Material(
+                  color: Colors.transparent,
+                  child: child!,
+                ),
+              ),
+              home: const AppEntry(),
+            );
+          }
+          // Android & Web: Use Material
           return MaterialApp(
             title: 'PUnova',
             debugShowCheckedModeBanner: false,
@@ -159,11 +184,11 @@ class _AppEntryState extends State<AppEntry> {
                     width: 72,
                     height: 72,
                     decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
+                      gradient: tc.primaryGradient,
                       borderRadius: BorderRadius.circular(22),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.accentTeal.withValues(alpha: 0.3),
+                          color: tc.accent.withValues(alpha: 0.3),
                           blurRadius: 32,
                           offset: const Offset(0, 12),
                         ),
@@ -172,13 +197,13 @@ class _AppEntryState extends State<AppEntry> {
                     child: const Icon(Icons.school_rounded,
                         color: Colors.white, size: 36),
                   ),
-                  const SizedBox(height: 24),
-                  const SizedBox(
+                  SizedBox(height: 24),
+                  SizedBox(
                     width: 24,
                     height: 24,
                     child: CircularProgressIndicator(
                       strokeWidth: 2.5,
-                      color: AppColors.accentTeal,
+                      color: tc.accent,
                     ),
                   ),
                 ],
@@ -253,51 +278,10 @@ class _DashboardShellState extends State<DashboardShell> {
       backgroundColor: tc.bg,
       extendBody: true,
       body: Container(
-        decoration: BoxDecoration(gradient: tc.bgGradient),
-        child: Stack(
-          children: [
-            // Ambient gradient orbs
-            if (tc.isDark) ...[
-              Positioned(
-                top: -100,
-                right: -80,
-                child: Container(
-                  width: 280,
-                  height: 280,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.accentTeal.withValues(alpha: 0.06),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 120,
-                left: -100,
-                child: Container(
-                  width: 320,
-                  height: 320,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.accentPurple.withValues(alpha: 0.04),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-            SafeArea(
-              bottom: false,
-              child: tabs[activeTab],
-            ),
-          ],
+        color: tc.bg,
+        child: SafeArea(
+          bottom: false,
+          child: tabs[activeTab],
         ),
       ),
       bottomNavigationBar: _buildFloatingNavBar(tc),
@@ -306,45 +290,23 @@ class _DashboardShellState extends State<DashboardShell> {
 
   Widget _buildFloatingNavBar(Tc tc) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      decoration: BoxDecoration(
+        color: tc.bgCard,
+        border: Border(top: BorderSide(color: tc.border, width: 0.5)),
+      ),
       child: SafeArea(
         top: false,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(26),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-            child: Container(
-              height: 68,
-              decoration: BoxDecoration(
-                color: tc.isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.white.withValues(alpha: 0.72),
-                borderRadius: BorderRadius.circular(26),
-                border: Border.all(
-                  color: tc.isDark
-                      ? Colors.white.withValues(alpha: 0.12)
-                      : Colors.black.withValues(alpha: 0.06),
-                  width: 0.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: tc.isDark ? 0.3 : 0.08),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _navItem(Icons.home_rounded, 'Home', 0, tc),
-                  _navItem(Icons.map_rounded, 'Map', 1, tc),
-                  _navCenterItem(tc),
-                  _navItem(Icons.notifications_rounded, 'Alerts', 3, tc),
-                  _navItem(Icons.person_rounded, 'Profile', 4, tc),
-                ],
-              ),
-            ),
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _navItem(Icons.home_rounded, 'Home', 0, tc),
+              _navItem(Icons.map_rounded, 'Map', 1, tc),
+              _navCenterItem(tc),
+              _navItem(Icons.notifications_rounded, 'Alerts', 3, tc),
+              _navItem(Icons.person_rounded, 'Profile', 4, tc),
+            ],
           ),
         ),
       ),
@@ -367,14 +329,14 @@ class _DashboardShellState extends State<DashboardShell> {
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.accentTeal.withValues(alpha: 0.12)
+                    ? tc.accent.withValues(alpha: 0.12)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
                 size: 22,
-                color: isSelected ? AppColors.accentTeal : tc.textMuted,
+                color: isSelected ? tc.accent : tc.textMuted,
               ),
             ),
             const SizedBox(height: 2),
@@ -383,7 +345,7 @@ class _DashboardShellState extends State<DashboardShell> {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: isSelected ? AppColors.accentTeal : tc.textMuted,
+                color: isSelected ? tc.accent : tc.textMuted,
               ),
             ),
           ],
@@ -396,20 +358,13 @@ class _DashboardShellState extends State<DashboardShell> {
     return GestureDetector(
       onTap: () => _onTabTapped(2),
       child: Container(
-        width: 48,
-        height: 48,
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
-          gradient: AppColors.primaryGradient,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.accentTeal.withValues(alpha: 0.35),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(14),
         ),
-        child: const Icon(Icons.badge_rounded, color: Colors.white, size: 24),
+        child: const Icon(Icons.badge_rounded, color: Colors.white, size: 22),
       ),
     );
   }
@@ -444,50 +399,10 @@ class _GuestDashboardShellState extends State<GuestDashboardShell> {
       backgroundColor: tc.bg,
       extendBody: true,
       body: Container(
-        decoration: BoxDecoration(gradient: tc.bgGradient),
-        child: Stack(
-          children: [
-            if (tc.isDark) ...[
-              Positioned(
-                top: -100,
-                right: -80,
-                child: Container(
-                  width: 280,
-                  height: 280,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.accentTeal.withValues(alpha: 0.06),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 120,
-                left: -100,
-                child: Container(
-                  width: 320,
-                  height: 320,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        AppColors.accentPurple.withValues(alpha: 0.04),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-            SafeArea(
-              bottom: false,
-              child: _tabs[_currentIndex],
-            ),
-          ],
+        color: tc.bg,
+        child: SafeArea(
+          bottom: false,
+          child: _tabs[_currentIndex],
         ),
       ),
       bottomNavigationBar: _buildGuestNavBar(tc),
@@ -496,43 +411,21 @@ class _GuestDashboardShellState extends State<GuestDashboardShell> {
 
   Widget _buildGuestNavBar(Tc tc) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      decoration: BoxDecoration(
+        color: tc.bgCard,
+        border: Border(top: BorderSide(color: tc.border, width: 0.5)),
+      ),
       child: SafeArea(
         top: false,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(26),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
-            child: Container(
-              height: 68,
-              decoration: BoxDecoration(
-                color: tc.isDark
-                    ? Colors.white.withValues(alpha: 0.08)
-                    : Colors.white.withValues(alpha: 0.72),
-                borderRadius: BorderRadius.circular(26),
-                border: Border.all(
-                  color: tc.isDark
-                      ? Colors.white.withValues(alpha: 0.12)
-                      : Colors.black.withValues(alpha: 0.06),
-                  width: 0.5,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: tc.isDark ? 0.3 : 0.08),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _guestNavItem(Icons.home_rounded, 'Home', 0, tc),
-                  _guestNavItem(Icons.map_rounded, 'Map', 1, tc),
-                  _guestNavItem(Icons.notifications_rounded, 'Alerts', 2, tc),
-                ],
-              ),
-            ),
+        child: SizedBox(
+          height: 64,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _guestNavItem(Icons.home_rounded, 'Home', 0, tc),
+              _guestNavItem(Icons.map_rounded, 'Map', 1, tc),
+              _guestNavItem(Icons.notifications_rounded, 'Alerts', 2, tc),
+            ],
           ),
         ),
       ),
@@ -555,14 +448,14 @@ class _GuestDashboardShellState extends State<GuestDashboardShell> {
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: isSelected
-                    ? AppColors.accentTeal.withValues(alpha: 0.12)
+                    ? tc.accent.withValues(alpha: 0.12)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
                 icon,
                 size: 22,
-                color: isSelected ? AppColors.accentTeal : tc.textMuted,
+                color: isSelected ? tc.accent : tc.textMuted,
               ),
             ),
             const SizedBox(height: 2),
@@ -571,7 +464,7 @@ class _GuestDashboardShellState extends State<GuestDashboardShell> {
               style: TextStyle(
                 fontSize: 10,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: isSelected ? AppColors.accentTeal : tc.textMuted,
+                color: isSelected ? tc.accent : tc.textMuted,
               ),
             ),
           ],

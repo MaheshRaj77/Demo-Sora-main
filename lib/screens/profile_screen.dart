@@ -139,6 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _sourceOption(
       BuildContext context, IconData icon, String label, VoidCallback onTap) {
+    final tc = Tc.of(context);
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -147,14 +148,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                gradient: tc.primaryGradient,
                 borderRadius: BorderRadius.circular(20)),
             child: Icon(icon, color: Colors.white, size: 30),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
           Text(label,
-              style: const TextStyle(
-                  color: AppColors.accentTeal,
+              style: TextStyle(
+                  color: tc.accent,
                   fontSize: 13,
                   fontWeight: FontWeight.w600)),
         ],
@@ -232,7 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
               borderSide:
-                  const BorderSide(color: AppColors.accentTeal, width: 1.5)),
+                  BorderSide(color: tc.accent, width: 1.5)),
           filled: true,
           fillColor: tc.glassWhite,
           contentPadding:
@@ -271,7 +272,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               min: 0,
               max: 2,
               divisions: 2,
-              activeColor: AppColors.accentTeal,
+              activeColor: tc.accent,
               inactiveColor: tc.glassBorder,
               label: ['Small', 'Medium', 'Large'][_fontSizeValue.round()],
               onChanged: (v) {
@@ -866,7 +867,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: ExpansionTile(
                       tilePadding: const EdgeInsets.symmetric(horizontal: 16),
                       childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                      iconColor: AppColors.accentTeal,
+                      iconColor: tc.accent,
                       collapsedIconColor: tc.textMuted,
                       title: Text(f['q']!,
                           style: TextStyle(
@@ -923,7 +924,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _versionRow(tc, 'Build', _appBuild.isNotEmpty ? _appBuild : 'dev'),
             _versionRow(tc, 'Platform', 'Flutter ($platformName)'),
             _versionRow(tc, 'Developer', 'Pondicherry University'),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Text('© 2026 Pondicherry University.\nAll rights reserved.',
                 style:
                     TextStyle(color: tc.textMuted, fontSize: 11, height: 1.5)),
@@ -932,9 +933,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK',
+            child: Text('OK',
                 style: TextStyle(
-                    color: AppColors.accentTeal, fontWeight: FontWeight.w700)),
+                    color: tc.accent, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -984,7 +985,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 4),
           Text('A Central University',
               style: TextStyle(
-                  color: AppColors.accentTeal,
+                  color: tc.accent,
                   fontSize: 13,
                   fontWeight: FontWeight.w600)),
           const SizedBox(height: 20),
@@ -1013,10 +1014,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 38,
             height: 38,
             decoration: BoxDecoration(
-              color: AppColors.accentTeal.withValues(alpha: 0.12),
+              color: tc.accent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(11),
             ),
-            child: Icon(icon, color: AppColors.accentTeal, size: 18),
+            child: Icon(icon, color: tc.accent, size: 18),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -1143,10 +1144,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Stack(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: const BoxDecoration(
+                        padding: EdgeInsets.all(3),
+                        decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            gradient: AppColors.primaryGradient),
+                            gradient: tc.primaryGradient),
                         child: Container(
                           padding: const EdgeInsets.all(2),
                           decoration: BoxDecoration(
@@ -1169,7 +1170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           width: 26,
                           height: 26,
                           decoration: BoxDecoration(
-                            gradient: AppColors.primaryGradient,
+                            gradient: tc.primaryGradient,
                             shape: BoxShape.circle,
                             border: Border.all(color: tc.bgCard, width: 2),
                           ),
@@ -1201,15 +1202,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: TextStyle(color: tc.textMuted, fontSize: 13)),
                       const SizedBox(height: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                             horizontal: 10, vertical: 3),
                         decoration: BoxDecoration(
-                            color: AppColors.accentTeal.withValues(alpha: 0.15),
+                            color: tc.accent.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(8)),
                         child: Text(
                             '${_profileDept.isNotEmpty ? _profileDept : 'CS'} • Semester ${_profileSemester > 0 ? _profileSemester : 5}',
-                            style: const TextStyle(
-                                color: AppColors.accentTeal,
+                            style: TextStyle(
+                                color: tc.accent,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600)),
                       ),
@@ -1232,8 +1233,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               trailing: Switch(
                 value: tc.isDark,
                 onChanged: (_) => themeNotifier.toggleTheme(),
-                activeThumbColor: AppColors.accentTeal,
-                activeTrackColor: AppColors.accentTeal.withValues(alpha: 0.3),
+                activeThumbColor: tc.accent,
+                activeTrackColor: tc.accent.withValues(alpha: 0.3),
               ),
             ),
             GlassListTile(
@@ -1256,13 +1257,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             GlassListTile(
                 icon: Icons.lock_rounded,
                 title: 'Change Password',
-                iconColor: AppColors.accentOrange,
+                iconColor: tc.primary,
                 onTap: () => _showChangePasswordSheet(context)),
             GlassListTile(
               icon: Icons.fingerprint_rounded,
               title: 'App Lock (Fingerprint / PIN)',
               subtitle: _appLockEnabled ? 'Enabled' : 'Disabled',
-              iconColor: AppColors.accentOrange,
+              iconColor: tc.primary,
               trailing: Switch(
                 value: _appLockEnabled,
                 onChanged: (v) async {
@@ -1301,15 +1302,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ? 'App Lock enabled — you\'ll need to authenticate on next launch'
                           : 'App Lock disabled'),
                       backgroundColor:
-                          v ? AppColors.accentGreen : AppColors.accentOrange,
+                          v ? AppColors.accentGreen : tc.primary,
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                     ));
                   }
                 },
-                activeThumbColor: AppColors.accentTeal,
-                activeTrackColor: AppColors.accentTeal.withValues(alpha: 0.3),
+                activeThumbColor: tc.accent,
+                activeTrackColor: tc.accent.withValues(alpha: 0.3),
               ),
             ),
           ]),

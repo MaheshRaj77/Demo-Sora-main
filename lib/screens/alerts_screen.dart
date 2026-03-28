@@ -235,12 +235,12 @@ class _AlertsScreenState extends State<AlertsScreen>
     }
   }
 
-  Color _alertColor(Alert alert) {
+  Color _alertColor(Tc tc, Alert alert) {
     switch (alert.category) {
       case 'academic':
         return [
-          AppColors.accentTeal,
-          AppColors.accentOrange,
+          tc.accent,
+          tc.primary,
           AppColors.accentPink,
           AppColors.accentGreen,
         ][alert.title.hashCode.abs() % 4];
@@ -273,7 +273,7 @@ class _AlertsScreenState extends State<AlertsScreen>
             tabAlignment: TabAlignment.start,
             indicatorSize: TabBarIndicatorSize.tab,
             indicator: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                gradient: tc.primaryGradient,
                 borderRadius: BorderRadius.circular(12)),
             labelColor: Colors.white,
             unselectedLabelColor: tc.textMuted,
@@ -290,11 +290,11 @@ class _AlertsScreenState extends State<AlertsScreen>
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         Expanded(
           child: _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(color: AppColors.accentTeal))
+              ? Center(
+                  child: CircularProgressIndicator(color: tc.accent))
               : TabBarView(
                   controller: _tabController,
                   children: [
@@ -317,7 +317,7 @@ class _AlertsScreenState extends State<AlertsScreen>
     }
     return RefreshIndicator(
       onRefresh: _fetchAll,
-      color: AppColors.accentTeal,
+      color: tc.accent,
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
         itemCount: _allAlerts.length,
@@ -329,7 +329,7 @@ class _AlertsScreenState extends State<AlertsScreen>
               alert.description ?? '',
               _relativeTime(alert.createdAt),
               _alertIcon(alert),
-              _alertColor(alert));
+              _alertColor(tc, alert));
         },
       ),
     );
@@ -343,7 +343,7 @@ class _AlertsScreenState extends State<AlertsScreen>
     }
     return RefreshIndicator(
       onRefresh: _fetchAll,
-      color: AppColors.accentTeal,
+      color: tc.accent,
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
         itemCount: _academicAlerts.length,
@@ -355,7 +355,7 @@ class _AlertsScreenState extends State<AlertsScreen>
               alert.description ?? '',
               _relativeTime(alert.createdAt),
               _alertIcon(alert),
-              _alertColor(alert));
+              _alertColor(tc, alert));
         },
       ),
     );
@@ -370,7 +370,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                     style: TextStyle(color: tc.textMuted, fontSize: 16)))
             : RefreshIndicator(
                 onRefresh: _fetchAll,
-                color: AppColors.accentTeal,
+                color: tc.accent,
                 child: ListView.builder(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                   itemCount: _lostFoundItems.length,
@@ -398,7 +398,7 @@ class _AlertsScreenState extends State<AlertsScreen>
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                gradient: AppColors.primaryGradient,
+                gradient: tc.primaryGradient,
                 borderRadius: BorderRadius.circular(18),
               ),
               child:
@@ -418,7 +418,7 @@ class _AlertsScreenState extends State<AlertsScreen>
     }
     return RefreshIndicator(
       onRefresh: _fetchAll,
-      color: AppColors.accentTeal,
+      color: tc.accent,
       child: ListView.builder(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
         itemCount: _emergencyAlerts.length,

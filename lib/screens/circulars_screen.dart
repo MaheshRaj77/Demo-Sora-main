@@ -81,15 +81,15 @@ class _CircularsScreenState extends State<CircularsScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              const GlassAppBar(title: 'Circulars'),
+              GlassAppBar(title: 'Circulars'),
               Expanded(
                 child: _isLoading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(
-                            color: AppColors.accentTeal))
+                            color: tc.accent))
                     : RefreshIndicator(
                         onRefresh: _fetchCirculars,
-                        color: AppColors.accentTeal,
+                        color: tc.accent,
                         child: ListView.builder(
                           padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
                           itemCount: _circulars.length,
@@ -126,8 +126,8 @@ class _CircularsScreenState extends State<CircularsScreen> {
                   Container(
                     width: 10,
                     height: 10,
-                    decoration: const BoxDecoration(
-                      color: AppColors.accentTeal,
+                    decoration: BoxDecoration(
+                      color: tc.accent,
                       shape: BoxShape.circle,
                     ),
                   ),
