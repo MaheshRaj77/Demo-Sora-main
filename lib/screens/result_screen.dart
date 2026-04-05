@@ -46,7 +46,8 @@ class _ResultScreenState extends State<ResultScreen> {
     try {
       final response =
           await ApiService().get('/results?semester=$_selectedSem');
-      final resultsList = response['results'] as List;
+      // Backend returns { semesters: [{semester, gpa, subjects: [...]}] }
+      final resultsList = (response['semesters'] as List?) ?? [];
 
       if (resultsList.isEmpty) {
         setState(() {
@@ -59,7 +60,6 @@ class _ResultScreenState extends State<ResultScreen> {
         return;
       }
 
-      // The backend returns [{semester, gpa, subjects: [...]}]
       // Find the matching semester or use first entry
       final semData = resultsList.firstWhere(
           (r) => r['semester'] == _selectedSem,
@@ -67,10 +67,15 @@ class _ResultScreenState extends State<ResultScreen> {
 
       final subjects = (semData['subjects'] as List?) ?? [];
       final grades = subjects.map((s) {
-        final gradeStr = s['grade'] as String;
-        final gradePoints = double.tryParse(s['grade_points'].toString()) ?? 0;
+        final gradeStr = (s['grade'] as String?) ?? '—';
+        // Backend field is grade_point (not grade_points)
+        final gradePoints =
+            double.tryParse(s['grade_point']?.toString() ?? '0') ?? 0;
+        // Backend field is subject_name (not subject)
+        final subjectName =
+            (s['subject_name'] as String?) ?? (s['subject'] as String?) ?? '';
         return _SubjectGrade(
-          s['subject'] as String,
+          subjectName,
           gradeStr,
           gradePoints.round(),
         );

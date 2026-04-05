@@ -46,9 +46,9 @@ class ApiConfig {
       return 'http://$_customIp:3000/api/v1';
     }
 
-    // Default: local IP (works for physical devices & simulators on same network)
-    // Update this according to your current local Wi-Fi IP
-    return 'http://10.188.37.92:3000/api/v1';
+    // Default: use the live Render backend instead of local IP
+    // This allows the app to work uniformly everywhere (and on your friend's phone)
+    return 'https://punova-backend-main.onrender.com/api/v1';
   }
 
   /// Get production Base URL from environment or hardcoded
@@ -89,8 +89,8 @@ class ApiConfig {
     return '$baseUrl$path';
   }
 
-  /// Request timeout duration
-  static const Duration requestTimeout = Duration(seconds: 30);
+  /// Request timeout duration — 60s to handle Render free tier cold starts
+  static const Duration requestTimeout = Duration(seconds: 60);
 
   /// Maximum retries
   static const int maxRetries = 3;

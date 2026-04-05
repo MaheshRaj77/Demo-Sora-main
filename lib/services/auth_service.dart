@@ -1,5 +1,5 @@
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'api_service.dart';
 
@@ -175,7 +175,7 @@ class AuthService {
       await ApiService().post('/auth/logout', body: {});
     } catch (e) {
       // Continue logout even if backend call fails
-      print('Error notifying backend of logout: $e');
+      debugPrint('Error notifying backend of logout: $e');
     }
 
     final prefs = await SharedPreferences.getInstance();

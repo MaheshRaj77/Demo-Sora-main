@@ -133,7 +133,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (source == null) return;
     final pickedFile = await picker.pickImage(source: source, maxWidth: 600);
     if (pickedFile != null) {
+      // Update local display immediately
       themeNotifier.setProfileImage(pickedFile.path);
+      // Upload to backend
+      try {
+        await ApiService().uploadFile(
+          '/auth/profile/avatar',
+          'avatar',
+          File(pickedFile.path),
+        );
+        // Reload profile to get the Cloudinary URL
+        _loadProfile();
+      } catch (_) {
+        // Silently fail — local preview still works
+      }
     }
   }
 
@@ -215,6 +228,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _sheetField(Tc tc, String label,
       {bool obscure = false,
+      bool readOnly = false,
       TextEditingController? controller,
       int maxLines = 1}) {
     return Padding(
@@ -222,8 +236,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: TextField(
         controller: controller,
         obscureText: obscure,
+        readOnly: readOnly,
         maxLines: maxLines,
-        style: TextStyle(color: tc.textPrimary, fontSize: 14),
+        style: TextStyle(color: readOnly ? tc.textMuted : tc.textPrimary, fontSize: 14),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(color: tc.textMuted, fontSize: 13),
@@ -319,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _sheetField(tc, 'Date of Birth', controller: dobCtrl),
           _sheetField(tc, 'Gender', controller: genderCtrl),
           _sheetField(tc, 'Phone', controller: phoneCtrl),
-          _sheetField(tc, 'Email', controller: emailCtrl),
+          _sheetField(tc, 'Email', controller: emailCtrl, readOnly: true),
           const SizedBox(height: 4),
           _sheetButton('Save Changes', () async {
             try {
@@ -328,7 +343,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 'date_of_birth': dobCtrl.text,
                 'gender': genderCtrl.text,
                 'phone': phoneCtrl.text,
-                'email': emailCtrl.text,
               });
               setState(() {
                 _profileName = nameCtrl.text;

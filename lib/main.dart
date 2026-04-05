@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io';
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 import 'config/api_config.dart';
 import 'theme/app_theme.dart';
 import 'screens/welcome_screen.dart';
@@ -18,14 +21,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 
+/// Silently ping the backend health endpoint to wake up the Render server.
+/// Runs fire-and-forget so it never delays app startup.
+void _warmUpServer() {
+  final url = Uri.parse('${ApiConfig.baseUrl}/health');
+  http.get(url).timeout(const Duration(seconds: 70)).catchError((_) {
+    // Ignore errors — this is a best-effort warm-up only
+    return http.Response('', 0);
+  });
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // ✅ Initialize API configuration
   ApiConfig.initialize();
+
+  // 🔥 Wake up Render server in background (avoids cold-start delay for user)
+  _warmUpServer();
   
-  // Allow google_fonts to fetch fonts during development
-  GoogleFonts.config.allowRuntimeFetching = true;
+  // Only allow runtime font fetching in debug mode
+  GoogleFonts.config.allowRuntimeFetching = kDebugMode;
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.dark,

@@ -1,6 +1,7 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import 'auth_service.dart';
@@ -11,12 +12,32 @@ class ApiService {
   factory ApiService() => _instance;
   ApiService._internal();
 
+  /// Wrap low-level http calls to convert SocketException / TimeoutException
+  /// into friendly [ApiException]s before they reach the UI.
+  Future<http.Response> _safeRequest(Future<http.Response> Function() fn) async {
+    try {
+      return await fn();
+    } on TimeoutException {
+      throw ApiException(
+        statusCode: 0,
+        message: 'The server is taking too long to respond. '
+            'It may be waking up — please try again in a moment.',
+      );
+    } on SocketException catch (e) {
+      throw ApiException(
+        statusCode: 0,
+        message: 'No internet connection or server unreachable. '
+            'Check your connection and try again. (${e.message})',
+      );
+    }
+  }
+
   /// GET request with optional auth token injection.
   Future<Map<String, dynamic>> get(String endpoint) async {
     final headers = await _headers();
-    final response = await http
+    final response = await _safeRequest(() => http
         .get(Uri.parse('${ApiConfig.baseUrl}$endpoint'), headers: headers)
-        .timeout(ApiConfig.requestTimeout);
+        .timeout(ApiConfig.requestTimeout));
     return _handleResponse(response, endpoint, 'GET');
   }
 
@@ -27,13 +48,13 @@ class ApiService {
     bool skipAuthHeader = false,
   }) async {
     final headers = await _headers(skipAuthHeader: skipAuthHeader);
-    final response = await http
+    final response = await _safeRequest(() => http
         .post(
           Uri.parse('${ApiConfig.baseUrl}$endpoint'),
           headers: headers,
           body: body != null ? jsonEncode(body) : null,
         )
-        .timeout(ApiConfig.requestTimeout);
+        .timeout(ApiConfig.requestTimeout));
     return _handleResponse(response, endpoint, 'POST', body: body, skipAuthHeader: skipAuthHeader);
   }
 
@@ -41,25 +62,25 @@ class ApiService {
   Future<Map<String, dynamic>> put(String endpoint,
       {Map<String, dynamic>? body}) async {
     final headers = await _headers();
-    final response = await http
+    final response = await _safeRequest(() => http
         .put(
           Uri.parse('${ApiConfig.baseUrl}$endpoint'),
           headers: headers,
           body: body != null ? jsonEncode(body) : null,
         )
-        .timeout(ApiConfig.requestTimeout);
+        .timeout(ApiConfig.requestTimeout));
     return _handleResponse(response, endpoint, 'PUT', body: body);
   }
 
   /// DELETE request.
   Future<Map<String, dynamic>> delete(String endpoint) async {
     final headers = await _headers();
-    final response = await http
+    final response = await _safeRequest(() => http
         .delete(
           Uri.parse('${ApiConfig.baseUrl}$endpoint'),
           headers: headers,
         )
-        .timeout(ApiConfig.requestTimeout);
+        .timeout(ApiConfig.requestTimeout));
     return _handleResponse(response, endpoint, 'DELETE');
   }
 
@@ -84,10 +105,11 @@ class ApiService {
       request.fields.addAll(fields);
     }
 
-    final streamedResponse =
-        await request.send().timeout(const Duration(seconds: 60));
-    final response = await http.Response.fromStream(streamedResponse);
-    return _handleResponse(response, endpoint, 'MULTIPART');
+    final streamedResponse = await _safeRequest(() async {
+      final sr = await request.send().timeout(const Duration(seconds: 60));
+      return http.Response.fromStream(sr);
+    });
+    return _handleResponse(streamedResponse, endpoint, 'MULTIPART');
   }
 
   /// Build headers with content-type and optional auth token.
@@ -159,7 +181,7 @@ class ApiService {
         }
       }
       if (errorList.isNotEmpty) {
-        errorMessage += ': ' + errorList.join(', ');
+        errorMessage += ': ${errorList.join(', ')}';
       }
     }
 
@@ -235,7 +257,7 @@ class ApiService {
         }
       }
       if (errorList.isNotEmpty) {
-        errorMessage += ': ' + errorList.join(', ');
+        errorMessage += ': ${errorList.join(', ')}';
       }
     }
 

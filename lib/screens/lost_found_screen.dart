@@ -457,11 +457,14 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
   Future<void> _submitReport(BuildContext context, Tc tc) async {
     setState(() => _isSubmitting = true);
     try {
+      final itemName = _nameCtrl.text.isEmpty ? 'Unnamed Item' : _nameCtrl.text;
       final fields = {
         'item_type': _itemType.toLowerCase(),
+        // Backend requires 'title' and 'description' as mandatory fields
+        'title': itemName,
+        'description': _descCtrl.text.isEmpty ? itemName : _descCtrl.text,
         'category': _category.isEmpty ? 'Other' : _category,
-        'item_name': _nameCtrl.text.isEmpty ? 'Unnamed Item' : _nameCtrl.text,
-        if (_descCtrl.text.isNotEmpty) 'description': _descCtrl.text,
+        'item_name': itemName,
         if (_locationCtrl.text.isNotEmpty) 'location': _locationCtrl.text,
         if (_dateCtrl.text.isNotEmpty) 'found_lost_date': _dateCtrl.text,
       };
@@ -483,8 +486,16 @@ class _LostFoundScreenState extends State<LostFoundScreen> {
     } catch (e) {
       setState(() => _isSubmitting = false);
       if (!mounted) return;
-      // Still show success for graceful fallback (backend might be unavailable)
-      if (context.mounted) _showSuccess(context, tc);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            e is ApiException ? e.message : 'Submission failed. Please try again.',
+          ),
+          backgroundColor: AppColors.accentRed,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ));
+      }
     }
   }
 

@@ -3,6 +3,7 @@ class ForumPost {
   final String? userId;
   final String title;
   final String body;
+  final String category;
   final int likesCount;
   final int repliesCount;
   final String? authorName;
@@ -14,6 +15,7 @@ class ForumPost {
     this.userId,
     required this.title,
     required this.body,
+    this.category = 'General',
     this.likesCount = 0,
     this.repliesCount = 0,
     this.authorName,
@@ -27,6 +29,7 @@ class ForumPost {
       userId: json['user_id'],
       title: json['title'],
       body: json['body'],
+      category: json['category'] ?? 'General',
       likesCount: json['likes_count'] ?? 0,
       repliesCount: json['replies_count'] ?? 0,
       authorName: json['author_name'],

@@ -18,12 +18,19 @@ class TimetableEntry {
   });
 
   factory TimetableEntry.fromJson(Map<String, dynamic> json) {
+    // Build timeSlot from separate start_time / end_time fields
+    final start = json['start_time'] as String? ?? '';
+    final end = json['end_time'] as String? ?? '';
+    final timeSlot = (start.isNotEmpty && end.isNotEmpty)
+        ? '$start – $end'
+        : (json['time_slot'] as String? ?? '');
+
     return TimetableEntry(
       id: json['id'],
       dayOfWeek: json['day_of_week'],
-      subject: json['subject'],
-      timeSlot: json['time_slot'],
-      faculty: json['faculty'],
+      subject: json['subject_name'] ?? json['subject'] ?? '',
+      timeSlot: timeSlot,
+      faculty: json['instructor'] ?? json['faculty'],
       room: json['room'],
       accentColor: json['accent_color'] ?? '#00D2FF',
     );

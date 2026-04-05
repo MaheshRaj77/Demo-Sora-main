@@ -28,8 +28,9 @@ class _MyIdScreenState extends State<MyIdScreen> {
 
   Future<void> _loadProfile() async {
     try {
-      final user = await AuthService().getProfile();
-      if (mounted) {
+      final response = await AuthService().getProfile();
+      final user = response['user'] as Map<String, dynamic>?;
+      if (mounted && user != null) {
         setState(() {
           _name = user['full_name'] ?? user['name'] ?? 'Student';
           _role = (user['role'] ?? 'STUDENT').toString().toUpperCase();

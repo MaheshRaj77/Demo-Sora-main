@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'dart:async';
 import 'dart:ui';
 import 'dart:io';
 import '../theme/app_theme.dart';
@@ -191,8 +192,12 @@ class _LoginScreenState extends State<LoginScreen>
       widget.onLoginSuccess();
     } on ApiException catch (e) {
       setState(() => _error = e.message);
+    } on SocketException {
+      setState(() => _error = 'No internet connection. Please check your network and try again.');
+    } on TimeoutException {
+      setState(() => _error = 'Server is taking too long to respond. It may be starting up — please wait a moment and try again.');
     } catch (e) {
-      setState(() => _error = 'Connection error. Is the server running?');
+      setState(() => _error = 'Connection failed. Please check your internet and try again.');
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
