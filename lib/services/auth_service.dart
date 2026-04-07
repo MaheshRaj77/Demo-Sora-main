@@ -1,13 +1,22 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'api_service.dart';
 
 /// Manages authentication state — login, register, token storage, and refresh.
+/// JWT tokens are stored in FlutterSecureStorage (hardware-backed keystore on
+/// Android, Keychain on iOS) to protect them from extraction.
 class AuthService {
   static const String _tokenKey = 'jwt_token';
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userKey = 'user_data';
+
+  // Secure storage for sensitive tokens — uses Android Keystore / iOS Keychain
+  static const _secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+  );
 
   static final AuthService _instance = AuthService._internal();
   factory AuthService() => _instance;
@@ -27,19 +36,28 @@ class AuthService {
     _isGuest = true;
   }
 
-  /// Get stored JWT token.
+  /// Get stored JWT token from secure storage.
   Future<String?> getToken() async {
     if (_cachedToken != null) return _cachedToken;
-    final prefs = await SharedPreferences.getInstance();
-    _cachedToken = prefs.getString(_tokenKey);
+    try {
+      _cachedToken = await _secureStorage.read(key: _tokenKey);
+    } catch (_) {
+      // Fallback to SharedPreferences if secure storage fails (e.g. emulator)
+      final prefs = await SharedPreferences.getInstance();
+      _cachedToken = prefs.getString(_tokenKey);
+    }
     return _cachedToken;
   }
 
-  /// Get stored refresh token.
+  /// Get stored refresh token from secure storage.
   Future<String?> getRefreshToken() async {
     if (_cachedRefreshToken != null) return _cachedRefreshToken;
-    final prefs = await SharedPreferences.getInstance();
-    _cachedRefreshToken = prefs.getString(_refreshTokenKey);
+    try {
+      _cachedRefreshToken = await _secureStorage.read(key: _refreshTokenKey);
+    } catch (_) {
+      final prefs = await SharedPreferences.getInstance();
+      _cachedRefreshToken = prefs.getString(_refreshTokenKey);
+    }
     return _cachedRefreshToken;
   }
 
@@ -114,10 +132,17 @@ class AuthService {
       if (newAccessToken != null) {
         _cachedToken = newAccessToken;
         _cachedRefreshToken = newRefreshToken;
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString(_tokenKey, newAccessToken);
-        if (newRefreshToken != null) {
-          await prefs.setString(_refreshTokenKey, newRefreshToken);
+        try {
+          await _secureStorage.write(key: _tokenKey, value: newAccessToken);
+          if (newRefreshToken != null) {
+            await _secureStorage.write(key: _refreshTokenKey, value: newRefreshToken);
+          }
+        } catch (_) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString(_tokenKey, newAccessToken);
+          if (newRefreshToken != null) {
+            await prefs.setString(_refreshTokenKey, newRefreshToken);
+          }
         }
         return true;
       }
@@ -137,6 +162,8 @@ class AuthService {
   Future<Map<String, dynamic>> getProfile() async {
     final response = await ApiService().get('/auth/profile');
     _cachedUser = response['user'];
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userKey, jsonEncode(_cachedUser));
     return response;
   }
 
@@ -145,7 +172,27 @@ class AuthService {
       Map<String, dynamic> updates) async {
     final response = await ApiService().put('/auth/profile', body: updates);
     _cachedUser = response['user'];
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_userKey, jsonEncode(_cachedUser));
     return response;
+  }
+
+  /// Load cached user data stored on the device.
+  Future<Map<String, dynamic>?> getCachedUser() async {
+    if (_cachedUser != null) return _cachedUser;
+
+    final prefs = await SharedPreferences.getInstance();
+    final cachedUser = prefs.getString(_userKey);
+    if (cachedUser == null || cachedUser.isEmpty) {
+      return null;
+    }
+
+    try {
+      _cachedUser = Map<String, dynamic>.from(jsonDecode(cachedUser));
+      return _cachedUser;
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Change password.
@@ -179,6 +226,10 @@ class AuthService {
     }
 
     final prefs = await SharedPreferences.getInstance();
+    try {
+      await _secureStorage.delete(key: _tokenKey);
+      await _secureStorage.delete(key: _refreshTokenKey);
+    } catch (_) {}
     await prefs.remove(_tokenKey);
     await prefs.remove(_refreshTokenKey);
     await prefs.remove(_userKey);
@@ -188,7 +239,7 @@ class AuthService {
     _isGuest = false;
   }
 
-  /// Save token and user to SharedPreferences.
+  /// Save token and user — tokens in secure storage, profile in SharedPreferences.
   Future<void> _saveSession(
     String token,
     String refreshToken,
@@ -197,9 +248,17 @@ class AuthService {
     _cachedToken = token;
     _cachedRefreshToken = refreshToken;
     _cachedUser = user;
+    try {
+      await _secureStorage.write(key: _tokenKey, value: token);
+      await _secureStorage.write(key: _refreshTokenKey, value: refreshToken);
+    } catch (_) {
+      // Fallback for environments where secure storage is unavailable
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_tokenKey, token);
+      await prefs.setString(_refreshTokenKey, refreshToken);
+    }
+    // Non-sensitive user profile goes in SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
-    await prefs.setString(_refreshTokenKey, refreshToken);
     await prefs.setString(_userKey, jsonEncode(user));
   }
 }

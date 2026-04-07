@@ -48,6 +48,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   Widget build(BuildContext context) {
     final tc = Tc.of(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenHeight < 650;
 
     return Scaffold(
       backgroundColor: tc.bg,
@@ -83,9 +85,9 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: Column(
                       children: [
-                        const Spacer(flex: 2),
-                        _buildLogo(tc),
-                        const SizedBox(height: 32),
+                        Spacer(flex: isSmallScreen ? 1 : 2),
+                        _buildLogo(tc, isSmallScreen),
+                        SizedBox(height: isSmallScreen ? 20 : 32),
                         Text(
                           'PUnova',
                           textAlign: TextAlign.center,
@@ -93,7 +95,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               .textTheme
                               .headlineLarge
                               ?.copyWith(
-                                fontSize: 42,
+                                fontSize: isSmallScreen ? 34 : 42,
                                 height: 1.1,
                                 letterSpacing: -1,
                               ),
@@ -108,7 +110,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                     color: tc.textMuted,
                                   ),
                         ),
-                        const Spacer(flex: 2),
+                        Spacer(flex: isSmallScreen ? 1 : 2),
                         _buildFeatures(tc),
                         const Spacer(),
                         SizedBox(
@@ -119,7 +121,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             onPressed: widget.onGetStarted,
                           ),
                         ),
-                        const SizedBox(height: 44),
+                        SizedBox(height: isSmallScreen ? 24 : 44),
                       ],
                     ),
                   ),
@@ -132,12 +134,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 
-  Widget _buildLogo(Tc tc) {
+  Widget _buildLogo(Tc tc, [bool isSmall = false]) {
+    final size = isSmall ? 80.0 : 100.0;
+    final radius = isSmall ? 24.0 : 30.0;
     return Container(
-      width: 100,
-      height: 100,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(radius),
         boxShadow: [
           BoxShadow(
             color: tc.accent.withValues(alpha: 0.3),
@@ -147,7 +151,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(radius),
         child: Image.asset('assets/images/app_logo.png', fit: BoxFit.cover),
       ),
     );

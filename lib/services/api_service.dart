@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import 'auth_service.dart';
@@ -11,6 +12,33 @@ class ApiService {
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
   ApiService._internal();
+
+  // ── Security: enforce HTTPS in production ──────────────────────────────────
+  static Uri _secureUri(String endpoint) {
+    final raw = '${ApiConfig.baseUrl}$endpoint';
+    final uri = Uri.parse(raw);
+    // Block cleartext HTTP in production builds
+    if (!kDebugMode && uri.scheme == 'http') {
+      throw ApiException(
+        statusCode: 0,
+        message: 'Insecure HTTP connection blocked in production.',
+      );
+    }
+    return uri;
+  }
+
+  // ── Security: sanitize string inputs to prevent injection ─────────────────
+  static String _sanitize(String input) {
+    // Strip null bytes and control characters (except tabs/newlines)
+    return input.replaceAll(RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'), '');
+  }
+
+  static Map<String, dynamic> _sanitizeBody(Map<String, dynamic> body) {
+    return body.map((k, v) {
+      if (v is String) return MapEntry(k, _sanitize(v));
+      return MapEntry(k, v);
+    });
+  }
 
   /// Wrap low-level http calls to convert SocketException / TimeoutException
   /// into friendly [ApiException]s before they reach the UI.
@@ -36,7 +64,7 @@ class ApiService {
   Future<Map<String, dynamic>> get(String endpoint) async {
     final headers = await _headers();
     final response = await _safeRequest(() => http
-        .get(Uri.parse('${ApiConfig.baseUrl}$endpoint'), headers: headers)
+        .get(_secureUri(endpoint), headers: headers)
         .timeout(ApiConfig.requestTimeout));
     return _handleResponse(response, endpoint, 'GET');
   }
@@ -48,11 +76,12 @@ class ApiService {
     bool skipAuthHeader = false,
   }) async {
     final headers = await _headers(skipAuthHeader: skipAuthHeader);
+    final sanitizedBody = body != null ? _sanitizeBody(body) : null;
     final response = await _safeRequest(() => http
         .post(
-          Uri.parse('${ApiConfig.baseUrl}$endpoint'),
+          _secureUri(endpoint),
           headers: headers,
-          body: body != null ? jsonEncode(body) : null,
+          body: sanitizedBody != null ? jsonEncode(sanitizedBody) : null,
         )
         .timeout(ApiConfig.requestTimeout));
     return _handleResponse(response, endpoint, 'POST', body: body, skipAuthHeader: skipAuthHeader);
@@ -62,11 +91,12 @@ class ApiService {
   Future<Map<String, dynamic>> put(String endpoint,
       {Map<String, dynamic>? body}) async {
     final headers = await _headers();
+    final sanitizedBody = body != null ? _sanitizeBody(body) : null;
     final response = await _safeRequest(() => http
         .put(
-          Uri.parse('${ApiConfig.baseUrl}$endpoint'),
+          _secureUri(endpoint),
           headers: headers,
-          body: body != null ? jsonEncode(body) : null,
+          body: sanitizedBody != null ? jsonEncode(sanitizedBody) : null,
         )
         .timeout(ApiConfig.requestTimeout));
     return _handleResponse(response, endpoint, 'PUT', body: body);
@@ -77,7 +107,7 @@ class ApiService {
     final headers = await _headers();
     final response = await _safeRequest(() => http
         .delete(
-          Uri.parse('${ApiConfig.baseUrl}$endpoint'),
+          _secureUri(endpoint),
           headers: headers,
         )
         .timeout(ApiConfig.requestTimeout));
@@ -93,7 +123,7 @@ class ApiService {
   }) async {
     final token = await AuthService().getToken();
     final request =
-        http.MultipartRequest('POST', Uri.parse('${ApiConfig.baseUrl}$endpoint'));
+        http.MultipartRequest('POST', _secureUri(endpoint));
 
     if (token != null) {
       request.headers['Authorization'] = 'Bearer $token';
@@ -112,10 +142,13 @@ class ApiService {
     return _handleResponse(streamedResponse, endpoint, 'MULTIPART');
   }
 
-  /// Build headers with content-type and optional auth token.
+  /// Build headers with content-type, security headers, and optional auth token.
   Future<Map<String, String>> _headers({bool skipAuthHeader = false}) async {
     final headers = <String, String>{
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-App-Platform': Platform.isAndroid ? 'android' : Platform.isIOS ? 'ios' : 'other',
     };
     
     if (!skipAuthHeader) {

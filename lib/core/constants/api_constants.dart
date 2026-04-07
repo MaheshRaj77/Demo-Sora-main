@@ -9,7 +9,7 @@ class ApiConstants {
   static const bool isProduction = bool.fromEnvironment('IS_PROD', defaultValue: false);
   static const String prodBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://punova-api.onrender.com/api/v1',
+    defaultValue: 'https://punova-backend-main.onrender.com/api/v1',
   );
 
   /// Auto-detect base URL based on platform

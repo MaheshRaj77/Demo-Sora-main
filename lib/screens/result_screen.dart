@@ -118,22 +118,11 @@ class _ResultScreenState extends State<ResultScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      // Fall back to static data
-      final staticData = _staticResults();
-      final grades = staticData[_selectedSem] ?? [];
-      int credits = grades.length * 4;
-      double sum = 0;
-      for (final g in grades) {
-        sum += g.point;
-      }
-      final sgpa =
-          grades.isNotEmpty ? (sum / grades.length).toStringAsFixed(1) : '—';
-
       setState(() {
-        _grades = grades;
-        _sgpa = sgpa;
-        _cgpa = '8.8';
-        _totalCredits = credits;
+        _grades = [];
+        _sgpa = '—';
+        _cgpa = '—';
+        _totalCredits = 0;
         _isLoading = false;
       });
     }
@@ -157,23 +146,6 @@ class _ResultScreenState extends State<ResultScreen> {
     }
   }
 
-  Map<int, List<_SubjectGrade>> _staticResults() {
-    return {
-      4: [
-        _SubjectGrade('Data Structures', 'A+', 10),
-        _SubjectGrade('Operating Systems', 'A', 9),
-        _SubjectGrade('DBMS', 'A+', 10),
-        _SubjectGrade('Computer Networks', 'B+', 8),
-        _SubjectGrade('Mathematics III', 'A', 9),
-      ],
-      3: [
-        _SubjectGrade('OOP with Java', 'A', 9),
-        _SubjectGrade('Digital Electronics', 'B+', 8),
-        _SubjectGrade('Discrete Maths', 'A+', 10),
-        _SubjectGrade('Data Communication', 'B', 7),
-      ],
-    };
-  }
 
   @override
   Widget build(BuildContext context) {

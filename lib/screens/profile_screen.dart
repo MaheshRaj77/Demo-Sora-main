@@ -43,6 +43,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadPackageInfo();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Sync font size display from persisted ThemeNotifier value
+    final scale = ThemeProvider.of(context).fontScale;
+    final idx = scale <= 0.9 ? 0 : (scale >= 1.1 ? 2 : 1);
+    if (_fontSizeValue != idx.toDouble()) {
+      _fontSizeValue = idx.toDouble();
+      _fontSizeLabel = ['Small', 'Medium', 'Large'][idx];
+    }
+  }
+
   Future<void> _loadPersistedSettings() async {
     final prefs = await SharedPreferences.getInstance();
     if (mounted) {
@@ -69,6 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final response = await AuthService().getProfile();
       final user = response['user'] as Map<String, dynamic>?;
       if (mounted && user != null) {
+        final avatarUrl = user['avatar_url'] ?? user['avatarUrl'];
         setState(() {
           _user = user;
           _profileName = user['full_name'] ?? user['name'] ?? 'Student';
@@ -76,6 +89,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _profileDept = user['department'] ?? 'CS';
           _profileSemester = int.tryParse(user['semester']?.toString() ?? '') ?? 0;
         });
+
+        if (avatarUrl is String && avatarUrl.isNotEmpty) {
+          ThemeProvider.of(context).setProfileImage(avatarUrl);
+        }
       }
     } catch (_) {
       // Keep defaults
@@ -137,11 +154,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
       themeNotifier.setProfileImage(pickedFile.path);
       // Upload to backend
       try {
-        await ApiService().uploadFile(
+        final response = await ApiService().uploadFile(
           '/auth/profile/avatar',
           'avatar',
           File(pickedFile.path),
         );
+        final uploadedUser = response['user'] as Map<String, dynamic>?;
+        final avatarUrl = uploadedUser?['avatar_url'] ?? uploadedUser?['avatarUrl'];
+        if (avatarUrl is String && avatarUrl.isNotEmpty) {
+          themeNotifier.setProfileImage(avatarUrl);
+        }
         // Reload profile to get the Cloudinary URL
         _loadProfile();
       } catch (_) {
@@ -270,6 +292,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // ═══════════════════════════════════════════════════════════════════════════
 
   void _showFontSizeSheet(BuildContext context) {
+    final themeNotifier = ThemeProvider.of(context);
+    // Determine initial slider index from current fontScale
+    final initScale = themeNotifier.fontScale;
+    final initIdx = initScale <= 0.9 ? 0 : (initScale >= 1.1 ? 2 : 1);
+    double localValue = initIdx.toDouble();
+
     _showThemedSheet(context, 'Font Size', (tc) {
       return StatefulBuilder(builder: (ctx, setLocal) {
         return Column(
@@ -283,29 +311,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
             Slider(
-              value: _fontSizeValue,
+              value: localValue,
               min: 0,
               max: 2,
               divisions: 2,
               activeColor: tc.accent,
               inactiveColor: tc.glassBorder,
-              label: ['Small', 'Medium', 'Large'][_fontSizeValue.round()],
+              label: ['Small', 'Medium', 'Large'][localValue.round()],
               onChanged: (v) {
-                setLocal(() {});
-                setState(() {
-                  _fontSizeValue = v;
-                  _fontSizeLabel = ['Small', 'Medium', 'Large'][v.round()];
-                });
+                setLocal(() => localValue = v);
               },
             ),
             const SizedBox(height: 8),
-            Text('Current: $_fontSizeLabel',
+            Text('Current: ${['Small', 'Medium', 'Large'][localValue.round()]}',
                 style: TextStyle(
                     color: tc.textSecondary,
                     fontSize: 14,
                     fontWeight: FontWeight.w600)),
             const SizedBox(height: 16),
-            _sheetButton('Apply', () => Navigator.pop(ctx)),
+            _sheetButton('Apply', () {
+              // Map slider index to fontScale
+              const scales = [0.85, 1.0, 1.15];
+              final scale = scales[localValue.round()];
+              themeNotifier.setFontScale(scale);
+              setState(() {
+                _fontSizeValue = localValue;
+                _fontSizeLabel = ['Small', 'Medium', 'Large'][localValue.round()];
+              });
+              Navigator.pop(ctx);
+            }),
           ],
         );
       });
@@ -318,14 +352,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _showPersonalInfoSheet(BuildContext context) {
     final nameCtrl = TextEditingController(
-        text: _user?['full_name'] ?? _user?['name'] ?? 'Balakumaran D');
+        text: _user?['full_name'] ?? _user?['name'] ?? '');
     final dobCtrl =
-        TextEditingController(text: _user?['date_of_birth'] ?? '15/06/2003');
-    final genderCtrl = TextEditingController(text: _user?['gender'] ?? 'Male');
+        TextEditingController(text: _user?['date_of_birth'] ?? '');
+    final genderCtrl = TextEditingController(text: _user?['gender'] ?? '');
     final phoneCtrl =
-        TextEditingController(text: _user?['phone'] ?? '+91 98765 43210');
+        TextEditingController(text: _user?['phone'] ?? '');
     final emailCtrl = TextEditingController(
-        text: _user?['email'] ?? 'dbalakumaran23@gmail.com');
+        text: _user?['email'] ?? '');
 
     _showThemedSheet(context, 'Personal Information', (tc) {
       return Column(
@@ -1140,7 +1174,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final profileImage = themeNotifier.profileImagePath;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+      padding: EdgeInsets.fromLTRB(
+          20, 12, 20, MediaQuery.of(context).padding.bottom + 80),
       physics: const BouncingScrollPhysics(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1203,7 +1238,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                           _profileName.isNotEmpty
                               ? _profileName
-                              : 'Balakumaran D',
+                              : 'Student',
                           style: TextStyle(
                               color: tc.textPrimary,
                               fontSize: 18,
@@ -1212,7 +1247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                           _profileEmail.isNotEmpty
                               ? _profileEmail
-                              : 'dbalakumaran23@gmail.com',
+                              : '',
                           style: TextStyle(color: tc.textMuted, fontSize: 13)),
                       const SizedBox(height: 6),
                       Container(
@@ -1454,8 +1489,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   ImageProvider? _getProfileImage(String? path) {
-    if (path == null) return null;
-    if (kIsWeb) return NetworkImage(path);
+    if (path == null || path.isEmpty) return null;
+
+    final uri = Uri.tryParse(path);
+    if (uri != null && uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https')) {
+      return NetworkImage(path);
+    }
+
+    if (kIsWeb) {
+      return NetworkImage(path);
+    }
+
     return FileImage(File(path));
   }
 

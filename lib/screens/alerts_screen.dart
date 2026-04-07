@@ -7,7 +7,8 @@ import '../models/lost_found_item.dart';
 import 'lost_found_screen.dart';
 
 class AlertsScreen extends StatefulWidget {
-  const AlertsScreen({super.key});
+  final int initialTab;
+  const AlertsScreen({super.key, this.initialTab = 0});
 
   @override
   State<AlertsScreen> createState() => _AlertsScreenState();
@@ -26,7 +27,7 @@ class _AlertsScreenState extends State<AlertsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 4, vsync: this, initialIndex: widget.initialTab);
     _fetchAll();
   }
 
@@ -57,11 +58,9 @@ class _AlertsScreenState extends State<AlertsScreen>
       });
     } catch (e) {
       setState(() {
-        _allAlerts = _staticAlerts();
-        _academicAlerts =
-            _allAlerts.where((a) => a.category == 'academic').toList();
-        _emergencyAlerts =
-            _allAlerts.where((a) => a.category == 'emergency').toList();
+        _allAlerts = [];
+        _academicAlerts = [];
+        _emergencyAlerts = [];
       });
     }
   }
@@ -76,122 +75,11 @@ class _AlertsScreenState extends State<AlertsScreen>
       });
     } catch (e) {
       setState(() {
-        _lostFoundItems = _staticLostFound();
+        _lostFoundItems = [];
       });
     }
   }
 
-  // ── Static fallback data ──
-  List<Alert> _staticAlerts() {
-    return [
-      Alert(
-          id: '1',
-          title: 'Class Cancelled',
-          description: 'Data Structures class at 10 AM is cancelled today.',
-          category: 'academic',
-          priority: 'normal',
-          createdAt: DateTime.now().subtract(const Duration(minutes: 30))),
-      Alert(
-          id: '2',
-          title: 'Library Due',
-          description: 'Return "Design Patterns" by tomorrow.',
-          category: 'academic',
-          priority: 'normal',
-          createdAt: DateTime.now().subtract(const Duration(hours: 1))),
-      Alert(
-          id: '3',
-          title: 'Weather Alert',
-          description: 'Heavy rain expected. Carry an umbrella.',
-          category: 'emergency',
-          priority: 'high',
-          createdAt: DateTime.now().subtract(const Duration(hours: 2))),
-      Alert(
-          id: '4',
-          title: 'Exam Schedule',
-          description: 'Mid-semester exams start from March 15.',
-          category: 'academic',
-          priority: 'normal',
-          createdAt: DateTime.now().subtract(const Duration(hours: 5))),
-      Alert(
-          id: '5',
-          title: 'Assignment Due',
-          description: 'OS assignment submission deadline is tomorrow.',
-          category: 'academic',
-          priority: 'normal',
-          createdAt: DateTime.now().subtract(const Duration(hours: 3))),
-      Alert(
-          id: '6',
-          title: 'New Grades',
-          description: 'DBMS lab grades have been published.',
-          category: 'academic',
-          priority: 'normal',
-          createdAt: DateTime.now().subtract(const Duration(days: 1))),
-      Alert(
-          id: '7',
-          title: 'Campus Closure',
-          description: 'Campus will be closed on Feb 25 for maintenance.',
-          category: 'emergency',
-          priority: 'high',
-          createdAt: DateTime.now().subtract(const Duration(hours: 6))),
-      Alert(
-          id: '8',
-          title: 'Weather Warning',
-          description:
-              'Cyclone alert: Stay indoors. All outdoor activities suspended.',
-          category: 'emergency',
-          priority: 'urgent',
-          createdAt: DateTime.now().subtract(const Duration(hours: 8))),
-      Alert(
-          id: '9',
-          title: 'Safety Threat',
-          description:
-              'Suspicious activity reported near Block C. Avoid the area.',
-          category: 'emergency',
-          priority: 'urgent',
-          createdAt: DateTime.now().subtract(const Duration(hours: 10))),
-      Alert(
-          id: '10',
-          title: 'Power Shutdown',
-          description:
-              'Scheduled power cut from 2 PM - 5 PM in academic blocks.',
-          category: 'emergency',
-          priority: 'normal',
-          createdAt: DateTime.now().subtract(const Duration(hours: 12))),
-    ];
-  }
-
-  List<LostFoundItem> _staticLostFound() {
-    return [
-      LostFoundItem(
-          id: '1',
-          itemType: 'found',
-          category: 'Bags',
-          itemName: 'Blue Backpack',
-          location: 'Found near Library entrance',
-          createdAt: DateTime.now().subtract(const Duration(hours: 1))),
-      LostFoundItem(
-          id: '2',
-          itemType: 'lost',
-          category: 'ID / Cards',
-          itemName: 'Student ID Card',
-          location: 'Lost in Cafeteria area',
-          createdAt: DateTime.now().subtract(const Duration(hours: 3))),
-      LostFoundItem(
-          id: '3',
-          itemType: 'found',
-          category: 'Electronics',
-          itemName: 'AirPods Pro',
-          location: 'Found in Lecture Hall 3',
-          createdAt: DateTime.now().subtract(const Duration(hours: 5))),
-      LostFoundItem(
-          id: '4',
-          itemType: 'lost',
-          category: 'Electronics',
-          itemName: 'Laptop Charger',
-          location: 'Lost in Computer Lab B',
-          createdAt: DateTime.now().subtract(const Duration(days: 1))),
-    ];
-  }
 
   // ── Helpers ──
   String _relativeTime(DateTime dt) {

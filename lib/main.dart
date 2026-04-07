@@ -52,20 +52,74 @@ void main() async {
 
 /// Global theme notifier — shared across the whole app.
 class ThemeNotifier extends ChangeNotifier {
+  static const String _profileImageKey = 'profile_image_source';
+  static const String _darkModeKey = 'dark_mode_enabled';
+  static const String _fontScaleKey = 'font_scale_value';
+
   bool _isDarkMode = false;
+  double _fontScale = 1.0; // 0.85 = Small, 1.0 = Medium, 1.15 = Large
   String? _profileImagePath;
 
   bool get isDarkMode => _isDarkMode;
+  double get fontScale => _fontScale;
   String? get profileImagePath => _profileImagePath;
 
   void toggleTheme() {
     _isDarkMode = !_isDarkMode;
     notifyListeners();
+    _persist(_darkModeKey, _isDarkMode.toString());
+  }
+
+  void setDarkMode(bool value) {
+    if (_isDarkMode == value) return;
+    _isDarkMode = value;
+    notifyListeners();
+    _persist(_darkModeKey, value.toString());
+  }
+
+  void setFontScale(double scale) {
+    _fontScale = scale.clamp(0.8, 1.2);
+    notifyListeners();
+    _persist(_fontScaleKey, _fontScale.toString());
+  }
+
+  Future<void> loadPreferences() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final dark = prefs.getBool(_darkModeKey) ?? false;
+      final scale = double.tryParse(prefs.getString(_fontScaleKey) ?? '1.0') ?? 1.0;
+      _isDarkMode = dark;
+      _fontScale = scale.clamp(0.8, 1.2);
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> _persist(String key, String value) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(key, value);
+    } catch (_) {}
   }
 
   void setProfileImage(String path) {
     _profileImagePath = path;
     notifyListeners();
+    _persistProfileImage(path);
+  }
+
+  Future<void> restoreProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    _profileImagePath = prefs.getString(_profileImageKey);
+    notifyListeners();
+  }
+
+  Future<void> _persistProfileImage(String path) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (path.isEmpty) {
+      await prefs.remove(_profileImageKey);
+      return;
+    }
+    await prefs.setString(_profileImageKey, path);
   }
 }
 
@@ -95,6 +149,13 @@ class _CampusConnectAppState extends State<CampusConnectApp> {
   final _themeNotifier = ThemeNotifier();
 
   @override
+  void initState() {
+    super.initState();
+    _themeNotifier.loadPreferences();
+    _themeNotifier.restoreProfileImage();
+  }
+
+  @override
   void dispose() {
     _themeNotifier.dispose();
     super.dispose();
@@ -120,12 +181,20 @@ class _CampusConnectAppState extends State<CampusConnectApp> {
                 DefaultCupertinoLocalizations.delegate,
                 DefaultWidgetsLocalizations.delegate,
               ],
-              builder: (context, child) => ScaffoldMessenger(
-                child: Material(
-                  color: Colors.transparent,
-                  child: child!,
-                ),
-              ),
+              builder: (context, child) {
+                final mq = MediaQuery.of(context);
+                return MediaQuery(
+                  data: mq.copyWith(
+                    textScaler: TextScaler.linear(_themeNotifier.fontScale),
+                  ),
+                  child: ScaffoldMessenger(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: child!,
+                    ),
+                  ),
+                );
+              },
               home: const AppEntry(),
             );
           }
@@ -136,6 +205,12 @@ class _CampusConnectAppState extends State<CampusConnectApp> {
             theme: _themeNotifier.isDarkMode
                 ? AppTheme.darkTheme
                 : AppTheme.lightTheme,
+            builder: (context, child) => MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: TextScaler.linear(_themeNotifier.fontScale),
+              ),
+              child: child!,
+            ),
             home: const AppEntry(),
           );
         },

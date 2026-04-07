@@ -32,43 +32,10 @@ class _CircularsScreenState extends State<CircularsScreen> {
       });
     } catch (e) {
       setState(() {
-        _circulars = _staticCirculars();
+        _circulars = [];
         _isLoading = false;
       });
     }
-  }
-
-  List<Circular> _staticCirculars() {
-    return [
-      Circular(
-          id: '1',
-          title: 'Exam Schedule Notice',
-          description:
-              'End semester examinations will commence from March 1st.',
-          publishedDate: DateTime(2024, 2, 18),
-          isImportant: true),
-      Circular(
-          id: '2',
-          title: 'Library Rules Update',
-          description: 'New library timings: 8 AM to 10 PM on weekdays.',
-          publishedDate: DateTime(2024, 2, 15),
-          isImportant: true),
-      Circular(
-          id: '3',
-          title: 'Hostel Maintenance',
-          description: 'Annual maintenance work in hostels from Feb 15-20.',
-          publishedDate: DateTime(2024, 2, 12)),
-      Circular(
-          id: '4',
-          title: 'Fee Payment Reminder',
-          description: 'Last date for semester fee payment is February 28.',
-          publishedDate: DateTime(2024, 2, 10)),
-      Circular(
-          id: '5',
-          title: 'Workshop Registration',
-          description: 'AI/ML Workshop by Google DevRel team on Feb 25.',
-          publishedDate: DateTime(2024, 2, 8)),
-    ];
   }
 
   @override

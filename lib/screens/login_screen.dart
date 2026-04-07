@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen>
   bool _isLogin = true;
   bool _isLoading = false;
   String? _error;
-  Set<String> _errorFields = {};
+  final Set<String> _errorFields = {};
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -206,6 +206,9 @@ class _LoginScreenState extends State<LoginScreen>
   @override
   Widget build(BuildContext context) {
     final tc = Tc.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    // On wider screens (tablets) centre content in a max-width container
+    final horizontalPad = screenWidth > 600 ? (screenWidth - 500) / 2 : 24.0;
 
     return Scaffold(
       backgroundColor: tc.bg,
@@ -237,7 +240,8 @@ class _LoginScreenState extends State<LoginScreen>
                 child: SlideTransition(
                   position: _slideAnim,
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(24, 48, 24, 32),
+                    padding: EdgeInsets.fromLTRB(
+                        horizontalPad, 48, horizontalPad, 32),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

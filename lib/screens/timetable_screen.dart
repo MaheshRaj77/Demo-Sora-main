@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../widgets/glass_widgets.dart';
 import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import '../models/timetable_entry.dart';
 
 class TimetableScreen extends StatefulWidget {
@@ -25,20 +26,58 @@ class _TimetableScreenState extends State<TimetableScreen> {
   List<TimetableEntry> _entries = [];
   bool _isLoading = true;
 
+  // Department support
+  static const List<String> _departments = [
+    'Computer Science',
+    'Electronics',
+    'Mathematics',
+    'Physics',
+    'Chemistry',
+    'Biotechnology',
+    'Commerce',
+    'Management',
+    'English',
+    'History',
+    'Political Science',
+    'Sociology',
+    'Economics',
+    'Tamil',
+    'Hindi',
+    'Earth Sciences',
+    'Biochemistry',
+    'Statistics',
+    'International Business',
+    'Bioinformatics',
+  ];
+  String _selectedDepartment = 'Computer Science';
+
   @override
   void initState() {
     super.initState();
-    // Default to current day of week
     final now = DateTime.now();
     _selectedDay = (now.weekday - 1).clamp(0, 5);
+    _loadUserDepartment();
+  }
+
+  Future<void> _loadUserDepartment() async {
+    try {
+      final cachedUser = await AuthService().getCachedUser();
+      if (cachedUser != null && cachedUser['department'] != null) {
+        final dept = cachedUser['department'] as String;
+        if (_departments.contains(dept)) {
+          setState(() => _selectedDepartment = dept);
+        }
+      }
+    } catch (_) {}
     _fetchTimetable();
   }
 
   Future<void> _fetchTimetable() async {
     setState(() => _isLoading = true);
     try {
+      final dept = Uri.encodeComponent(_selectedDepartment);
       final response =
-          await ApiService().get('/timetable?day=${_daysFull[_selectedDay]}');
+          await ApiService().get('/timetable?day=${_daysFull[_selectedDay]}&department=$dept');
       final ttJson = response['timetable'] as List;
       setState(() {
         _entries = ttJson.map((j) => TimetableEntry.fromJson(j)).toList();
@@ -46,48 +85,10 @@ class _TimetableScreenState extends State<TimetableScreen> {
       });
     } catch (e) {
       setState(() {
-        _entries = _staticTimetable();
+        _entries = [];
         _isLoading = false;
       });
     }
-  }
-
-  List<TimetableEntry> _staticTimetable() {
-    // Monday fallback
-    return [
-      TimetableEntry(
-          id: '1',
-          dayOfWeek: 'Monday',
-          subject: 'Data Structures',
-          timeSlot: '09:00 – 10:00',
-          faculty: 'Dr. Kumar',
-          room: 'Room 301',
-          accentColor: '#00D2FF'),
-      TimetableEntry(
-          id: '2',
-          dayOfWeek: 'Monday',
-          subject: 'Operating Systems',
-          timeSlot: '10:15 – 11:15',
-          faculty: 'Dr. Patel',
-          room: 'Room 204',
-          accentColor: '#7C3AED'),
-      TimetableEntry(
-          id: '3',
-          dayOfWeek: 'Monday',
-          subject: 'DBMS Lab',
-          timeSlot: '11:30 – 13:00',
-          faculty: 'Prof. Singh',
-          room: 'Lab B2',
-          accentColor: '#EC4899'),
-      TimetableEntry(
-          id: '4',
-          dayOfWeek: 'Monday',
-          subject: 'Computer Networks',
-          timeSlot: '14:00 – 15:00',
-          faculty: 'Dr. Sharma',
-          room: 'Room 102',
-          accentColor: '#22C55E'),
-    ];
   }
 
   Color _parseHex(String hex) {
@@ -107,6 +108,8 @@ class _TimetableScreenState extends State<TimetableScreen> {
             children: [
               const GlassAppBar(title: 'Timetable'),
               const SizedBox(height: 8),
+              _buildDeptSelector(tc),
+              const SizedBox(height: 12),
               _buildDaySelector(tc),
               SizedBox(height: 16),
               Expanded(
@@ -126,6 +129,40 @@ class _TimetableScreenState extends State<TimetableScreen> {
                           ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDeptSelector(Tc tc) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: GlassCard(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: DropdownButtonHideUnderline(
+          child: DropdownButton<String>(
+            value: _selectedDepartment,
+            isExpanded: true,
+            icon: Icon(Icons.keyboard_arrow_down_rounded, color: tc.accent),
+            dropdownColor: tc.bgCard,
+            style: TextStyle(
+              color: tc.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+            items: _departments.map((dept) {
+              return DropdownMenuItem(
+                value: dept,
+                child: Text(dept),
+              );
+            }).toList(),
+            onChanged: (val) {
+              if (val != null && val != _selectedDepartment) {
+                setState(() => _selectedDepartment = val);
+                _fetchTimetable();
+              }
+            },
           ),
         ),
       ),

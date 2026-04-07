@@ -9,9 +9,8 @@ import 'services_screen.dart';
 import 'events_screen.dart';
 import 'circulars_screen.dart';
 import 'timetable_screen.dart';
-import 'result_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'alerts_screen.dart';
-import 'lost_found_screen.dart';
 import 'map_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -90,24 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
-        _updates = [
-          {
-            'tag': 'Academic',
-            'time': '2h ago',
-            'title': 'Fall 2024 Registration Open',
-            'desc':
-                'Course registration is now open for all senior students. Check your allotted time slot.',
-            'color': AppColors.accent
-          },
-          {
-            'tag': 'Event',
-            'time': '5h ago',
-            'title': 'Tech Fest 2024 Registrations',
-            'desc':
-                'Annual tech fest is around the corner. Register for hackathon and coding contests.',
-            'color': AppColors.accentPurple
-          },
-        ];
+        _hasError = true;
+        _updates = [];
       });
     }
   }
@@ -135,9 +118,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<void> _launchResultsUrl() async {
+    final uri = Uri.parse('https://pondiuni.samarth.edu.in/index.php/site/login');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final tc = Tc.of(context);
+    // Dynamically compute bottom padding to account for nav bar + safe area
+    final bottomPad = MediaQuery.of(context).padding.bottom + 80;
     return RefreshIndicator(
       onRefresh: _loadAll,
       color: AppColors.accent,
@@ -145,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
         ),
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+        padding: EdgeInsets.fromLTRB(20, 12, 20, bottomPad),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -310,19 +302,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _quickAccessTile(Tc tc, _QuickItem item) {
+    // Tile icon size scales with screen width (compact on small phones)
+    final iconSize = MediaQuery.of(context).size.width < 360 ? 44.0 : 52.0;
     return GestureDetector(
       onTap: item.onTap,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 52,
-            height: 52,
+            width: iconSize,
+            height: iconSize,
             decoration: BoxDecoration(
               color: item.color.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: Icon(item.icon, color: item.color, size: 24),
+            child: Icon(item.icon, color: item.color, size: iconSize * 0.46),
           ),
           const SizedBox(height: 8),
           Text(
@@ -358,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> {
             title: 'Results',
             subtitle: 'View grades',
             color: AppColors.accentGreen,
-            onTap: () => _navigateTo(context, const ResultScreen()),
+            onTap: () => _launchResultsUrl(),
           ),
         ),
       ],
@@ -383,9 +377,9 @@ class _HomeScreenState extends State<HomeScreen> {
           child: _ActionCard(
             icon: Icons.search_rounded,
             title: 'Lost & Found',
-            subtitle: 'Report items',
+            subtitle: 'Find & report',
             color: AppColors.accentPink,
-            onTap: () => _navigateTo(context, const LostFoundScreen()),
+            onTap: () => _navigateTo(context, const AlertsScreen(initialTab: 2)),
           ),
         ),
       ],
@@ -560,6 +554,13 @@ class _SearchSheetState extends State<_SearchSheet> {
         .toList();
   }
 
+  Future<void> _launchResultsUrl() async {
+    final uri = Uri.parse('https://pondiuni.samarth.edu.in/index.php/site/login');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
   void _navigate(String title) {
     Navigator.pop(context);
     Widget? screen;
@@ -575,11 +576,12 @@ class _SearchSheetState extends State<_SearchSheet> {
       case 'Timetable':
         screen = const TimetableScreen();
       case 'Results':
-        screen = const ResultScreen();
+        _launchResultsUrl();
+        return;
       case 'Map':
         screen = const MapScreen();
       case 'Lost & Found':
-        screen = const LostFoundScreen();
+        screen = const AlertsScreen(initialTab: 2);
       case 'Alerts':
         screen = const AlertsScreen();
     }

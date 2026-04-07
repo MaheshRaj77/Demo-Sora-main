@@ -38,46 +38,14 @@ class _ForumScreenState extends State<ForumScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      // Fallback to static data if API is unreachable
       setState(() {
-        _posts = _staticPosts();
+        _posts = [];
         _isLoading = false;
       });
     }
   }
 
-  List<ForumPost> _staticPosts() {
-    final now = DateTime.now();
-    return [
-      ForumPost(
-          id: '1',
-          title: 'Best study spots on campus?',
-          body:
-              'Looking for quiet places to study. Library gets too crowded after 3PM.',
-          authorName: 'Sarah K.',
-          likesCount: 12,
-          repliesCount: 8,
-          createdAt: now.subtract(const Duration(hours: 2))),
-      ForumPost(
-          id: '2',
-          title: 'Anyone interested in Python study group?',
-          body:
-              'Planning weekly sessions. Beginners welcome! DM me for details.',
-          authorName: 'Mike R.',
-          likesCount: 24,
-          repliesCount: 15,
-          createdAt: now.subtract(const Duration(hours: 4))),
-      ForumPost(
-          id: '3',
-          title: 'Cafeteria food review',
-          body:
-              'The new pasta counter is actually pretty good. Recommend the arrabiata.',
-          authorName: 'Priya S.',
-          likesCount: 31,
-          repliesCount: 22,
-          createdAt: now.subtract(const Duration(hours: 8))),
-    ];
-  }
+
 
   Future<void> _toggleLike(ForumPost post) async {
     try {

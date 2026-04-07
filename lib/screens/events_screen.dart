@@ -32,44 +32,10 @@ class _EventsScreenState extends State<EventsScreen> {
       });
     } catch (e) {
       setState(() {
-        _events = _staticEvents();
+        _events = [];
         _isLoading = false;
       });
     }
-  }
-
-  List<Event> _staticEvents() {
-    return [
-      Event(
-          id: '1',
-          title: 'Tech Fest 2024',
-          description: 'Annual tech fest with hackathon and coding contests.',
-          eventDate: DateTime(2024, 3, 15),
-          venue: 'Main Auditorium',
-          category: 'tech'),
-      Event(
-          id: '2',
-          title: 'Cultural Night',
-          description: 'An evening of music, dance, and drama performances.',
-          eventDate: DateTime(2024, 3, 20),
-          venue: 'Open Air Theatre',
-          category: 'cultural'),
-      Event(
-          id: '3',
-          title: 'Sports Day',
-          description:
-              'Annual sports competition. Cricket, football, athletics.',
-          eventDate: DateTime(2024, 3, 25),
-          venue: 'Sports Complex',
-          category: 'sports'),
-      Event(
-          id: '4',
-          title: 'Alumni Meet',
-          description: 'Connect with alumni from all departments.',
-          eventDate: DateTime(2024, 4, 5),
-          venue: 'Convention Hall',
-          category: 'networking'),
-    ];
   }
 
   @override
