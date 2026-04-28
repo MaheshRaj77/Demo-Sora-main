@@ -139,28 +139,30 @@ class FeatureRepository {
     String? contactInfo,
     String? imagePath,
   }) async {
+    // Use snake_case keys to match backend API expectations
     if (imagePath != null) {
       // Multipart upload
+      final fileName = imagePath.split('/').last;
       final formData = FormData.fromMap({
-        'itemType': itemType,
+        'item_type': itemType,
         'title': title,
         'description': description,
         if (category != null) 'category': category,
         if (location != null) 'location': location,
-        if (contactInfo != null) 'contactInfo': contactInfo,
-        'image': await MultipartFile.fromFile(imagePath, filename: 'image.jpg'),
+        if (contactInfo != null) 'contact_info': contactInfo,
+        'image': await MultipartFile.fromFile(imagePath, filename: fileName),
       });
       final response = await _dio.post(ApiConstants.lostFound, data: formData);
       return response.data['data']['item'] as Map<String, dynamic>;
     }
 
     final response = await _dio.post(ApiConstants.lostFound, data: {
-      'itemType': itemType,
+      'item_type': itemType,
       'title': title,
       'description': description,
       if (category != null) 'category': category,
       if (location != null) 'location': location,
-      if (contactInfo != null) 'contactInfo': contactInfo,
+      if (contactInfo != null) 'contact_info': contactInfo,
     });
     return response.data['data']['item'] as Map<String, dynamic>;
   }
